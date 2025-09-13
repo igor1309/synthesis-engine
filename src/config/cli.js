@@ -8,6 +8,9 @@ export function loadCliOverrides(argv = process.argv) {
   if (m['context-max-tokens'] != null) process.env.CONTEXT_MAX_TOKENS = String(m['context-max-tokens']);
   if (m['lines-head'] != null) process.env.LINES_HEAD = String(m['lines-head']);
   if (m['lines-tail'] != null) process.env.LINES_TAIL = String(m['lines-tail']);
+  if (m['github-base-url']) process.env.GITHUB_BASE_URL = m['github-base-url'];
+  if (m['openai-base-url']) process.env.OPENAI_BASE_URL = m['openai-base-url'];
+  if (m['github-concurrency'] != null) process.env.GITHUB_CONCURRENCY = String(m['github-concurrency']);
 }
 
 export function parseArgs(argv) {
@@ -18,10 +21,10 @@ export function parseArgs(argv) {
     const key = a.slice(2);
     const next = argv[i + 1];
     switch (key) {
-      case 'log-level': case 'openai-model': case 'run-summary':
+      case 'log-level': case 'openai-model': case 'run-summary': case 'github-base-url': case 'openai-base-url':
         if (next && !next.startsWith('--')) { out[key] = next; i++; }
         break;
-      case 'openai-temperature': case 'context-max-tokens': case 'lines-head': case 'lines-tail':
+      case 'openai-temperature': case 'context-max-tokens': case 'lines-head': case 'lines-tail': case 'github-concurrency':
         if (next && !next.startsWith('--')) { out[key] = Number(next); i++; }
         break;
       case 'dry-run':
@@ -40,4 +43,3 @@ function truthy(v) {
   const s = String(v).toLowerCase();
   return s === '1' || s === 'true' || s === 'yes' || s === 'y';
 }
-

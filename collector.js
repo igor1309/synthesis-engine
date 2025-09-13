@@ -49,7 +49,8 @@ async function main() {
       // 1. Collect Files
       logger.info('collector: start file collection', { repos: cfg.repos.length });
       const gh = await createGitHubClient(cfg.ghPat, cfg.baseUrl);
-      const collected = await collectAll(gh, cfg, { concurrency: 6 });
+      const concurrency = Number(process.env.GITHUB_CONCURRENCY || 6);
+      const collected = await collectAll(gh, cfg, { concurrency });
       const savedFiles = collected.savedFiles;
       metrics = collected.metrics;
       logger.info('collector: file collection complete', { downloaded: savedFiles.length, cacheHits: metrics.totals.cacheHits, cacheMisses: metrics.totals.cacheMisses, bytes: metrics.totals.downloadedBytes });
