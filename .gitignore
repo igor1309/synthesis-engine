@@ -5,3 +5,4 @@ repo-content.md
 **/*.log
 logs/
 test/snapshots/actual-*.md
+**/.repo2md.tmp.*

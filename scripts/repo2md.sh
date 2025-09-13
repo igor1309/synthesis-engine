@@ -333,4 +333,6 @@ printf '<!-- END OF SNAPSHOT -->\n' >> "$TMP"
 
 # --- Finalize ----------------------------------------------------------------
 cat "$TMP"
+# Ensure temp is removed even if trap is disabled
+rm -f "$TMP" || true
 trap - EXIT
