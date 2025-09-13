@@ -1,47 +1,6 @@
 # Top Priorities (Detailed)
 
-1) Implement OpenAI synthesis with chunking and prompt handling
-- Why
-  - Produces the actual `synthesis_memo.md` from the consolidated context.
-  - Handles large contexts safely with chunking and deterministic merging.
-- Scope
-  - Prompt handling
-    - Load `prompts/master.md` with existence validation and a minimal fallback; allow CLI/env overrides.
-    - Model and params via CLI/env (e.g., `OPENAI_MODEL`, temperature, max tokens).
-  - Synthesis
-    - Token accounting and guard rails; chunk/map-reduce when context exceeds the cap.
-    - Retries with backoff on transient errors; optional streaming path for future use.
-    - Deterministic merge of partials with section headers (e.g., Objective Synthesis / Critical Analysis).
-  - Output
-    - Validate non-empty, non-placeholder output; write to `synthesis_memo.md`.
-    - Return non-zero exit on failure; clear errors for quota/timeouts.
-- Deliverables
-  - `src/ai/synthesize` (single-shot and chunked flows, token estimator helper).
-  - Integrated call in `src/pipeline/run` after context build; modest logs of token/size summary.
-  - Minimal README note for required env and usage.
-- Acceptance
-  - For small contexts, one-shot synthesis writes a non-empty memo and exits 0.
-  - For large contexts, chunked synthesis completes with a coherent merged memo.
-  - On API failures, exits non-zero with actionable error messages and no secret leaks.
-
-2) Reusable Agent Workflow (GitHub Actions)
-- Why
-  - Enables other repos to invoke the Synthesis Engine consistently via `workflow_call`.
-  - Centralizes inputs, secrets, validation, and artifact handling.
-- Scope
-  - Create `.github/workflows/agent-synthesis.yml` as a reusable workflow with `on: workflow_call`.
-  - Inputs: `node-version` (default 20), `memo-path` (default `synthesis_memo.md`), `dry-run` (bool), `log-level`.
-  - Secrets: `GH_PAT` (required), `OPENAI_API_KEY` (optional until synthesis is live).
-  - Steps: checkout, setup node + cache, install, run `node collector.js`, run synthesis step (placeholder until #1 done), validate memo, write step summary, upload artifacts on failure.
-  - Outputs: memo bytes, context bytes, files count, duration.
-- Deliverables
-  - New reusable workflow file with documentation snippet in `README.md` showing how to call it.
-  - Example consumer snippet using `uses: <owner>/<repo>/.github/workflows/agent-synthesis.yml@trunk`.
-- Acceptance
-  - A sample `workflow_dispatch` job in this repo can call the reusable workflow successfully.
-  - Step summary shows key metrics; artifacts uploaded on failure; respects `dry-run`.
-
-3) Config, security, and observability hardening
+1) Config, security, and observability hardening
 - Why
   - Prevents fragile runs in CI and local; improves debuggability and trustworthiness.
 - Scope
@@ -63,3 +22,29 @@
 - Acceptance
   - CI shows enriched step summary with metrics and error counts; artifacts attached on failure.
   - Misconfiguration fails fast with clear messages; secrets are never written to logs.
+
+2) Memo linting and output validation
+- Why
+  - Ensures the memo is structurally correct and useful, preventing low-quality or malformed outputs from passing CI.
+- Scope
+  - Validate required sections and headers, enforce at least one item under Themes/Connections/Conflicts when context is non-empty.
+  - Check for "Source:" citation lines and basic Markdown well-formedness (no unclosed fences, missing separators).
+  - Add a small CLI `memo-validate` used in CI and locally; exit non-zero on failure with actionable messages.
+- Deliverables
+  - `src/ai/validateMemo.js` with reusable checks; integrate in collector or separate npm script.
+  - CI step to run validation; step summary lines on failures.
+- Acceptance
+  - Bad or placeholder memos fail validation; good memos pass. Clear error messages.
+
+3) Resilience: rate limiting and retries
+- Why
+  - Improves reliability under GitHub 403/429 and OpenAI transient errors; avoids flakiness.
+- Scope
+  - Implement exponential backoff with jitter and respect `Retry-After` for GitHub; cap concurrency on 403/429.
+  - Add retry policy for OpenAI calls (timeouts, 429, 5xx) with max attempts; surface concise error summaries.
+  - Add tests with fake clients simulating rate limits/timeouts.
+- Deliverables
+  - Retry/backoff utilities and integration in GitHub client and synthesis module.
+  - Configurable limits via env/CLI; minimal logs showing retries.
+- Acceptance
+  - Simulated 429/5xx recover after retries; severe cases fail fast with clear messages and codes.

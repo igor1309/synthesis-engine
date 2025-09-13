@@ -8,6 +8,11 @@
 - GitHub collector: added config loader, repo spec parsing (`owner/repo@ref:path`), recursive inbox listing, Markdown filter, SHA cache, concurrency; writes to `temp_inbox_files/`.
 - Observability: structured JSON logging, step summary with context stats; per-repo metrics and artifacts snapshot (`artifacts/<timestamp>/`).
 - Tests: added config-parse and collector cache tests; all tests pass.
+- OpenAI synthesis: implemented token estimation, chunking/map-reduce, prompt loading with fallback; wired into collector; added synth tests.
+- Dotenv + dry-run: load .env/.env.local; support DRY_RUN to skip network; lazy import OpenAI/Octokit.
+- Caching fix: re-download files on cache hit when local copy missing; ensures context builds after temp cleanup.
+- Reusable workflow: added `.github/workflows/agent-synthesis.yml` with inputs/secrets/outputs; README usage snippet.
+- Safety rules: AGENTS.md updated to never touch .env/.env.local and prefer explicit staging; dotenv test now uses a temp dir.
 
 ## 2025-09-12
 
