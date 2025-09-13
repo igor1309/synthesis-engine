@@ -64,4 +64,4 @@ This repository expects AI coding agents (OpenAI Codex/Codex CLI) to follow the 
 - Validate required envs; never log secrets; config precedence (CLI > env > package.json > defaults).
 - Maintain builder parity (shell/Node) with snapshot tests; normalize newlines; treat shell output as snapshot truth when helpful.
 - Use lightweight caches (e.g., ETag/SHA) with clear keys and safe fallbacks.
-
+- Never touch local env files: do not create, modify, or delete `.env` or `.env.local`. Tests must use temporary directories for dotenv scenarios.
