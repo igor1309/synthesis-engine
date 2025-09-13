@@ -1,13 +1,37 @@
 # Top Priorities (Detailed)
 
-1) Config polish and security (remaining)
+1) Dogfood reusable workflow + fail-on-error
 - Why
-  - Close the loop on docs and safety for varied environments.
+  - Remove duplication between workflows, ensure consistent validation, and allow CI to fail on real per-repo errors when desired.
 - Scope
-  - Add a precedence matrix to docs/Config.md (CLI > env > defaults) with examples.
-  - Expand redaction tests to cover run-summary.settings and step summary content.
-  - Add proxy/GHE troubleshooting notes with examples.
+  - Update `.github/workflows/generate-memo.yml` to call `agent-synthesis.yml` via `uses:`.
+  - Add an input to the reusable workflow for `fail-on-error` and pass `FAIL_ON_ERROR` env through.
+  - Keep artifacts upload and step summary; verify memo validation still runs.
 - Deliverables
-  - Config.md updates and a small redaction test addition.
+  - Updated workflows and README snippet alignment.
 - Acceptance
-  - Docs clearly show precedence and proxy/GHE setup; redaction test covers settings.
+  - Scheduled/manual run succeeds; when `fail-on-error: true` and errors exist, job exits non‑zero and artifacts are present.
+
+2) Config/docs precedence + redaction tests
+- Why
+  - Clarify configuration behavior and strengthen safety around secret logging.
+- Scope
+  - Add a precedence matrix (CLI > env > defaults) with concrete examples to `docs/Config.md`.
+  - Extend redaction tests to include `run-summary.settings` and step summary strings (no raw secrets).
+  - Expand Troubleshooting with proxy/GHE examples (base URLs, proxies).
+- Deliverables
+  - Config.md updates; extended redaction test.
+- Acceptance
+  - Tests pass; docs clearly show precedence and proxy/GHE setup with examples.
+
+3) Synthesis quality: citations and prompt
+- Why
+  - Increase memo usefulness by enforcing citations and tightening prompting.
+- Scope
+  - Enhance validator to require at least one "Source:" citation when context is non‑empty (tunable threshold).
+  - Refine `prompts/master.md` wording to emphasize evidence and sourcing.
+  - Add tests for validator citation rule; document guidance in README.
+- Deliverables
+  - Updated validator, prompt, and tests.
+- Acceptance
+  - Memos lacking citations fail validation; valid memos pass; docs explain expectations.
