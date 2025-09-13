@@ -24,36 +24,53 @@ async function main() {
   try {
     // Load .env first so loaders can see env vars
     await loadDotEnv(process.cwd());
-    // Load and validate configuration
-    cfg = await loadConfig(process.cwd());
-    summary.repos = cfg.repos.length;
+    const dryRun = String(process.env.DRY_RUN || '').toLowerCase() === '1' || String(process.env.DRY_RUN || '').toLowerCase() === 'true' || !process.env.GH_PAT;
 
-    // 1. Collect Files
-    logger.info('collector: start file collection', { repos: cfg.repos.length });
-    const gh = createGitHubClient(cfg.ghPat);
-    const { savedFiles, metrics } = await collectAll(gh, cfg, { concurrency: 6 });
-    logger.info('collector: file collection complete', { downloaded: savedFiles.length, cacheHits: metrics.totals.cacheHits, cacheMisses: metrics.totals.cacheMisses, bytes: metrics.totals.downloadedBytes });
+    let context = '';
+    let metrics = { repos: [], totals: { cacheHits: 0, cacheMisses: 0, downloadedBytes: 0 } };
 
-    // 2. Prepare Context
-    logger.info('collector: build context start');
-    const files = savedFiles.length ? savedFiles : await listFilesRecursive(cfg.tempDir);
-    summary.contextFiles = files.length;
-    if (files.length === 0) {
-      logger.warn('collector: no files collected; context will be empty');
+    if (dryRun) {
+      summary.repos = 0;
+      logger.warn('collector: dry-run mode or GH_PAT missing; skipping GitHub collection');
+      context = '# REPO CONTENT\n\n_No files collected (dry-run)._\n';
+      summary.contextFiles = 0;
+      const contextBytes = Buffer.byteLength(context, 'utf-8');
+      summary.contextBytes = contextBytes;
+      summary.contextTokens = Math.floor((contextBytes + 3) / 4);
+    } else {
+      // Load and validate configuration
+      cfg = await loadConfig(process.cwd());
+      summary.repos = cfg.repos.length;
+
+      // 1. Collect Files
+      logger.info('collector: start file collection', { repos: cfg.repos.length });
+      const gh = await createGitHubClient(cfg.ghPat);
+      const collected = await collectAll(gh, cfg, { concurrency: 6 });
+      const savedFiles = collected.savedFiles;
+      metrics = collected.metrics;
+      logger.info('collector: file collection complete', { downloaded: savedFiles.length, cacheHits: metrics.totals.cacheHits, cacheMisses: metrics.totals.cacheMisses, bytes: metrics.totals.downloadedBytes });
+
+      // 2. Prepare Context
+      logger.info('collector: build context start');
+      const files = savedFiles.length ? savedFiles : await listFilesRecursive(cfg.tempDir);
+      summary.contextFiles = files.length;
+      if (files.length === 0) {
+        logger.warn('collector: no files collected; context will be empty');
+      }
+      context = await buildContext(files, {
+        cwd: cfg.tempDir,
+        projectRoot: process.cwd(),
+        linesHead: Number(process.env.LINES_HEAD) || 0,
+        linesTail: Number(process.env.LINES_TAIL) || 0,
+      });
+      const contextBytes = Buffer.byteLength(context, 'utf-8');
+      summary.contextBytes = contextBytes;
+      summary.contextTokens = Math.floor((contextBytes + 3) / 4);
+      summary.filesDownloaded = savedFiles.length;
     }
-    const context = await buildContext(files, {
-      cwd: cfg.tempDir,
-      projectRoot: process.cwd(),
-      linesHead: Number(process.env.LINES_HEAD) || 0,
-      linesTail: Number(process.env.LINES_TAIL) || 0,
-    });
-    const contextBytes = Buffer.byteLength(context, 'utf-8');
-    summary.contextBytes = contextBytes;
-    summary.contextTokens = Math.floor((contextBytes + 3) / 4);
 
     // 3. Synthesis
     let memoContent = '';
-    const dryRun = String(process.env.DRY_RUN || '').toLowerCase() === '1' || String(process.env.DRY_RUN || '').toLowerCase() === 'true';
     if (dryRun || !process.env.OPENAI_API_KEY) {
       logger.warn('collector: synthesis skipped', { reason: dryRun ? 'DRY_RUN' : 'missing OPENAI_API_KEY' });
       memoContent = [
@@ -95,7 +112,6 @@ async function main() {
     summary.memoBytes = st.size;
     logger.info('collector: memo saved', { output: OUTPUT_FILE, bytes: st.size });
 
-    summary.filesDownloaded = savedFiles.length;
     summary.status = 'success';
 
     // Persist artifacts snapshot
@@ -109,7 +125,7 @@ async function main() {
     // Enrich step summary with per-repo stats
     const lines = [];
     lines.push('## Per-repo stats');
-    for (const r of metrics.repos) {
+    for (const r of metrics.repos || []) {
       lines.push(`- ${r.repo}@${r.ref}:${r.inboxPath} — md: ${r.mdFiles}, dl: ${r.downloadedCount}, cache hits: ${r.cacheHits}, bytes: ${r.downloadedBytes}, time: ${(r.durationMs/1000).toFixed(2)}s`);
     }
     await logger.writeStepSummary(lines.join('\n') + '\n');
