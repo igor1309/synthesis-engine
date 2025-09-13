@@ -1,27 +1,26 @@
 # Top Priorities (Detailed)
 
-1) Config polish and security
+1) Config polish and security (remaining)
 - Why
-  - Finalize configuration surfaces and security posture for varied environments.
+  - Close the loop on docs and safety for varied environments.
 - Scope
-  - Add optional GitHub Enterprise base URL and HTTP(S) proxy support (env/CLI).
-  - Redaction utilities to scrub sensitive values from logs and summaries.
-  - Document precedence and troubleshooting; refine errors with remediation tips.
+  - Add a precedence matrix to docs/Config.md (CLI > env > defaults) with examples.
+  - Expand redaction tests to cover run-summary.settings and step summary content.
+  - Add proxy/GHE troubleshooting notes with examples.
 - Deliverables
-  - Config parsing for base URL/proxy; redaction helper; docs.
+  - Config.md updates and a small redaction test addition.
 - Acceptance
-  - Runs succeed behind proxies/enterprise; logs never contain secrets; docs cover common failures.
+  - Docs clearly show precedence and proxy/GHE setup; redaction test covers settings.
 
-2) Per-repo error details
+2) Summary UX: error samples
 - Why
-  - Speed up debugging by surfacing concrete failures.
+  - Make errors visible at a glance during CI review.
 - Scope
-  - Capture non-404 fetch errors with codes and sample messages; include counts per repo.
-  - Add optional `--fail-on-error` to exit non-zero if any per-repo errors occurred.
+  - Add a compact “Errors” section to the step summary when errors exist, showing up to a few samples with repo/path/status.
 - Deliverables
-  - Error aggregation in collector metrics; validator/tests.
+  - Step summary template update.
 - Acceptance
-  - CI can fail on real errors when enabled; run-summary lists per-repo error counts.
+  - CI step summary displays a concise errors list when applicable.
 
 3) (free)
-  - Reserved for next discovered need after per-repo errors.
+  - Reserved for the next discovered need.

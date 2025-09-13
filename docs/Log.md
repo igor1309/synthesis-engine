@@ -19,8 +19,9 @@
 - Observability enrichment: added warn/error counters, remediation tips; versioned schema docs.
 - Resilience: OpenAI retries/backoff + GitHub retries; adaptive concurrency on 403/429; tracked retry counters/wait and surfaced in summaries; tests added.
 - Config/security: GHE base URL and OpenAI base URL support; proxy envs; secret redaction in logs/summary; Troubleshooting doc; README links.
- - Run-summary UX: persisted step-summary.md under artifacts; added settings to run-summary; added `npm run summary` CLI for quick terminal overview.
- - Summary UX polish: table-formatted per-repo stats; artifact links in step summary (with Actions URL when available).
+- Run-summary UX: persisted step-summary.md under artifacts; added settings to run-summary; added `npm run summary` CLI for quick terminal overview.
+- Summary UX polish: table-formatted per-repo stats; artifact links in step summary (with Actions URL when available).
+ - Per-repo errors: capture non-404 list/fetch errors with samples; added `--fail-on-error` to exit non-zero when errors present; tests and docs updated.
 
 ## 2025-09-12
 
