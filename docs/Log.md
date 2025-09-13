@@ -16,7 +16,8 @@
 - Memo validation: added structural validator and CLI; integrated into CI (generate-memo.yml, agent-synthesis.yml); tests added.
 - Hardening: CLI overrides for env, error codes in logs/summary, GitHub request timeouts, retry/backoff utility (used for GitHub listing/content), .env.example, README flags.
 - Observability enrichment: versioned run-summary with synthesis metadata; enriched step summary totals/ratios; documented schema in README.
- - Resilience: added OpenAI retries/backoff and configurable GitHub retry attempts; test covers 429 recovery.
+ - Observability enrichment: added warn/error counters and remediation tips; added docs/run-summary-schema.md.
+ - Resilience: added OpenAI retries/backoff and configurable GitHub retry attempts; adaptive concurrency in collector (halves on 403/429); tests for retries and adaptive path.
 
 ## 2025-09-12
 
