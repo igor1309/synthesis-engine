@@ -8,6 +8,7 @@ import { loadConfig } from './src/config/index.js';
 import { createGitHubClient } from './src/github/client.js';
 import { collectAll } from './src/github/collect.js';
 import { logger } from './src/logger/index.js';
+import { synthesizeMemo } from './src/ai/synthesize.js';
 
 // Placeholder util to keep API symmetry if needed later
 const noop = promisify((cb) => cb(null));
@@ -57,9 +58,14 @@ async function main() {
     summary.contextBytes = contextBytes;
     summary.contextTokens = Math.floor((contextBytes + 3) / 4);
 
-    // 3. Synthesis (placeholder)
-    logger.info('collector: send context to AI (placeholder)');
-    const memoContent = "AI Generated Content Here"; // Placeholder
+    // 3. Synthesis
+    logger.info('collector: synthesis start', { model: process.env.OPENAI_MODEL || 'gpt-4o-mini' });
+    const memoContent = await synthesizeMemo(openai, context, {
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      temperature: Number(process.env.OPENAI_TEMPERATURE || 0.2),
+      projectRoot: process.cwd(),
+      contextMaxTokens: Number(process.env.CONTEXT_MAX_TOKENS || 120000)
+    });
 
     // 4. Save Output
     await fs.writeFile(OUTPUT_FILE, memoContent);

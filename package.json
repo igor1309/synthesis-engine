@@ -7,7 +7,7 @@
     "scripts": {
       "start": "node collector.js",
       "lint": "eslint .",
-      "test": "bash -lc 'set -e; node test/build-context.test.js; node test/config-parse.test.js; node test/collector.test.js'"
+      "test": "bash -lc 'set -e; node test/build-context.test.js; node test/config-parse.test.js; node test/collector.test.js; node test/synthesize.test.js'"
     },
     "dependencies": {
       "@octokit/rest": "^20.1.1",
