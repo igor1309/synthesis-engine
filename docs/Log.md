@@ -18,6 +18,10 @@
 
 - Synthesis cache: added cross-run cache for one-shot, map, and reduce phases under `artifacts/cache/` with TTL; added cache metrics to synthesis meta and step summary; schema bumped to v1.1; tests for hits/misses and TTL.
 
+- Bug fix: define local `human()` in `collector.js` to format sizes in step summary; prevents runtime error after memo save.
+- Real run verification: generated memo with ~39k token context; second run showed OpenAI cache hit in synthesis meta; artifacts persisted under `artifacts/<timestamp>/`.
+- TODOs: updated `todo/top-priorities.md` — removed completed synthesis cache item; next priorities are multi-provider LLM abstraction, validator v2, and incremental context de-duplication.
+
 ## 2025-09-12
 
 - Gemini 2.5 Pro came up with a `Synthesis Engine` and other.
