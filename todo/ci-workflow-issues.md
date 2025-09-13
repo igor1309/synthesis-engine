@@ -5,6 +5,5 @@
 - **Issue**: `synthesis_memo.md` is hardcoded
 - **Impact**: Less flexible, difficult to change output filename
 
-## 2. No Output Validation
-- **Issue**: No verification that collector.js produces expected output
-- **Impact**: May commit empty or malformed files
+## 2. Output Validation — addressed
+- Validation step added to ensure `synthesis_memo.md` exists and is non-empty; memo validator runs in both workflows.

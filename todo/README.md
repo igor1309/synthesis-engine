@@ -1,11 +1,8 @@
 # TODO Index
 
 - build-context.md — BuildContext tasks and improvements
-- prompt.md — Master prompt improvements and open questions
-- collector-architecture.md — Module decomposition and refactor plan
-- collector-issues.md — Current issues in collector.js
-- collector-implementation.md — Implementation plan for collector.js
+- collector-architecture.md — Module decomposition and refactor plan (remaining)
+- collector-implementation.md — Archived implementation plan for collector.js (context only)
 - duplication-issues.md — Cross-repo duplication tracking
 - ci-workflow-issues.md — GitHub Actions/CI workflow issues
-- suggested-improvements.md — General improvements across the project
 - security-and-config.md — Env validation, secrets hygiene, configuration

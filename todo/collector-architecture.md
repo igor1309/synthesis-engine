@@ -1,4 +1,4 @@
-# Collector Architecture Refactor Plan
+# Collector Architecture Refactor Plan (status: largely implemented)
 
 ## Target Structure
 - `src/config` — env + CLI parsing; defaults and validation
@@ -17,15 +17,10 @@
 - Deterministic behavior in CI; portable across environments
 - Observability: structured logs + concise run summary
 
-## Key Tasks
-- Extract config and logger modules
-- Implement GitHub collector with concurrency + ETag cache
-- Implement AI synthesis with model selection, retries, chunked flow
-- Add artifacts and step summary
-- Replace `collector.js` body with pipeline call
+## Key Tasks (remaining)
+- Most modules are in place (config, logger, github, context, ai, io).
+- Consider extracting a small `src/pipeline/run` orchestrator and keeping `collector.js` as a thin CLI shim.
 
 ## Cross-Refs
-- See `collector-implementation.md` for step-by-step plan
-- See `build-context.md` for context builder parity and tests
+- See `build-context.md` for remaining builder work
 - See `ci-workflow-issues.md` for CI-related changes
-
