@@ -1,1 +1,6 @@
 .DS_Store
+temp_inbox_files/
+artifacts/
+repo-content.md
+**/*.log
+logs/
