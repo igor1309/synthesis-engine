@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
 import { readJsonSafe, writeJson, ensureDir, writeFileAtomic } from '../io/fs.js';
+import { withRetry } from '../utils/retry.js';
 
 const MARKDOWN_EXTS = new Set(['.md', '.markdown', '.mdx']);
 
@@ -112,7 +113,7 @@ function isMarkdown(p) {
 }
 
 async function getFileContent(octokit, owner, repo, filePath, ref) {
-  const res = await octokit.repos.getContent({ owner, repo, path: filePath, ref });
+  const res = await withRetry(() => octokit.repos.getContent({ owner, repo, path: filePath, ref }), { tries: 4 });
   if (!Array.isArray(res.data) && res.data && res.data.type === 'file' && res.data.content) {
     const buff = Buffer.from(res.data.content, 'base64');
     return buff.toString('utf-8');
@@ -130,7 +131,7 @@ async function listTreeRecursive(octokit, owner, repo, basePath, ref) {
   const out = [];
   async function walk(p) {
     try {
-      const res = await octokit.repos.getContent({ owner, repo, path: p, ref });
+      const res = await withRetry(() => octokit.repos.getContent({ owner, repo, path: p, ref }), { tries: 4 });
       if (Array.isArray(res.data)) {
         for (const item of res.data) {
           if (item.type === 'dir') {

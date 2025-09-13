@@ -5,6 +5,11 @@ export async function createGitHubClient(token, baseUrl) {
     throw err;
   });
   const { Octokit } = mod;
-  const octokit = new Octokit({ auth: token, baseUrl: baseUrl || undefined });
+  const timeout = Number(process.env.GITHUB_TIMEOUT || 10000);
+  const octokit = new Octokit({
+    auth: token,
+    baseUrl: baseUrl || undefined,
+    request: { timeout },
+  });
   return octokit;
 }

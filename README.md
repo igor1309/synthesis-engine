@@ -44,6 +44,16 @@ synthesis-engine/
 - Optional context tuning: `LINES_HEAD`, `LINES_TAIL` to truncate large files.
 - Set `DRY_RUN=1` to bypass both GitHub and OpenAI regardless of secrets.
 
+CLI flags (override env)
+- `--log-level info|debug|warn|error`
+- `--dry-run` (same as `DRY_RUN=1`)
+- `--openai-model gpt-4o-mini`
+- `--openai-temperature 0.2`
+- `--context-max-tokens 120000`
+- `--lines-head 0 --lines-tail 0`
+
+Example: `node collector.js --dry-run --log-level debug --context-max-tokens 80000`
+
 **Reusable Workflow**
 - This repo provides a reusable workflow to run synthesis from other repos.
 - Example caller workflow:

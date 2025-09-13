@@ -8,6 +8,8 @@ import { collectAll } from './src/github/collect.js';
 import { logger } from './src/logger/index.js';
 import { loadDotEnv } from './src/config/dotenv.js';
 import { synthesizeMemo } from './src/ai/synthesize.js';
+import { loadCliOverrides } from './src/config/cli.js';
+import { classifyError, ErrorCodes } from './src/errors/codes.js';
 
 // Placeholder util to keep API symmetry if needed later
 const noop = promisify((cb) => cb(null));
@@ -24,6 +26,8 @@ async function main() {
   try {
     // Load .env first so loaders can see env vars
     await loadDotEnv(process.cwd());
+    // Apply CLI overrides (highest precedence)
+    loadCliOverrides(process.argv);
     const dryRun = String(process.env.DRY_RUN || '').toLowerCase() === '1' || String(process.env.DRY_RUN || '').toLowerCase() === 'true' || !process.env.GH_PAT;
 
     let context = '';
@@ -130,7 +134,9 @@ async function main() {
     }
     await logger.writeStepSummary(lines.join('\n') + '\n');
   } catch (error) {
-    logger.error('collector: error', { error: String(error?.message || error) });
+    const code = classifyError(error);
+    logger.error('collector: error', { error: String(error?.message || error), code });
+    summary.errorCode = code;
     process.exit(1);
   } finally {
     summary.durationMs = Date.now() - t0;
