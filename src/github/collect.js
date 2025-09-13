@@ -41,12 +41,14 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
   const ref = spec.ref || undefined;
   const inboxPath = spec.inboxPath || 'inbox';
 
-  const entries = await listTreeRecursive(octokit, spec.owner, spec.repo, inboxPath, ref);
+  const { entries, warnings } = await listTreeRecursive(octokit, spec.owner, spec.repo, inboxPath, ref);
   const files = entries.filter((e) => e.type === 'file' && isMarkdown(e.path));
 
   let cacheHits = 0;
   let cacheMisses = 0;
   let downloadedBytes = 0;
+  let warnCount = Array.isArray(warnings) ? warnings.length : 0;
+  let errorCount = 0;
 
   const tasks = files.map((file) => async () => {
     const cacheKey = cacheKeyFor(spec, file.path, ref);
@@ -91,6 +93,8 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
       cacheMisses,
       downloadedBytes,
       downloadedCount: saved.length,
+      warnCount,
+      errorCount,
     }
   };
 }
@@ -129,6 +133,7 @@ async function getFileContent(octokit, owner, repo, filePath, ref) {
 async function listTreeRecursive(octokit, owner, repo, basePath, ref) {
   // Use Contents API recursion via directories
   const out = [];
+  let warnings = [];
   async function walk(p) {
     try {
       const res = await withRetry(() => octokit.repos.getContent({ owner, repo, path: p, ref }), { tries: 4 });
@@ -145,12 +150,15 @@ async function listTreeRecursive(octokit, owner, repo, basePath, ref) {
       }
     } catch (err) {
       // If inbox path does not exist, skip silently
-      if (err && err.status === 404) return;
+      if (err && err.status === 404) {
+        if (p === basePath) warnings.push({ code: 'INBOX_NOT_FOUND', path: basePath });
+        return;
+      }
       throw err;
     }
   }
   await walk(basePath);
-  return out;
+  return { entries: out, warnings };
 }
 
 async function runLimited(tasks, limit) {
@@ -165,7 +173,7 @@ async function runLimited(tasks, limit) {
 }
 
 function aggregateTotals(perRepo) {
-  const t = { filesConsidered: 0, mdFiles: 0, cacheHits: 0, cacheMisses: 0, downloadedBytes: 0, downloadedCount: 0, durationMs: 0 };
+  const t = { filesConsidered: 0, mdFiles: 0, cacheHits: 0, cacheMisses: 0, downloadedBytes: 0, downloadedCount: 0, durationMs: 0, warnCount: 0, errorCount: 0 };
   for (const r of perRepo) {
     t.filesConsidered += r.filesConsidered || 0;
     t.mdFiles += r.mdFiles || 0;
@@ -174,6 +182,8 @@ function aggregateTotals(perRepo) {
     t.downloadedBytes += r.downloadedBytes || 0;
     t.downloadedCount += r.downloadedCount || 0;
     t.durationMs += r.durationMs || 0;
+    t.warnCount += r.warnCount || 0;
+    t.errorCount += r.errorCount || 0;
   }
   return t;
 }

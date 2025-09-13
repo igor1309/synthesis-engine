@@ -147,9 +147,17 @@ async function main() {
       lines.push('## Totals');
       lines.push(`- md files: ${t.mdFiles} · downloaded: ${t.downloadedCount} · bytes: ${human(t.downloadedBytes || 0)}`);
       lines.push(`- cache: hits ${t.cacheHits} / misses ${t.cacheMisses} (hit rate ${(ratio*100).toFixed(1)}%)`);
+      lines.push(`- issues: warnings ${t.warnCount || 0} · errors ${t.errorCount || 0}`);
       if (summary.contextBytes !== undefined) lines.push(`- context: files ${summary.contextFiles || 0} · size ${human(summary.contextBytes)} · est tokens ~${summary.contextTokens || 0}`);
       if (summary.synthesis) lines.push(`- synthesis: model ${summary.synthesis.model} · chunked ${summary.synthesis.chunked ? 'yes' : 'no'} · chunks ${summary.synthesis.chunks}`);
       if (summary.durationMs !== undefined) lines.push(`- duration: ${(summary.durationMs/1000).toFixed(1)}s`);
+    }
+    // Remediation tips
+    const tips = remediationTips(metrics, summary);
+    if (tips.length) {
+      lines.push('');
+      lines.push('## Tips');
+      for (const tip of tips) lines.push(`- ${tip}`);
     }
     await logger.writeStepSummary(lines.join('\n') + '\n');
   } catch (error) {
@@ -184,3 +192,26 @@ async function listFilesRecursive(dir) {
 }
 
 main();
+
+function remediationTips(metrics, summary) {
+  const tips = [];
+  const totals = metrics?.totals || {};
+  const perRepo = metrics?.repos || [];
+  // No context produced
+  if ((summary.contextFiles || 0) === 0) {
+    tips.push('No context files were built. Ensure inbox paths contain markdown or adjust config.');
+  }
+  // Inbox missing warnings
+  const missing = perRepo.filter(r => (r.warnCount || 0) > 0);
+  if (missing.length) {
+    tips.push('Some inbox paths were not found. Verify repo specs and paths (owner/repo@ref:path).');
+  }
+  // Cache always hits (but no local files)? handled by re-download fix; still add generic tip
+  if ((totals.mdFiles || 0) > 0 && (totals.downloadedCount || 0) === 0) {
+    tips.push('All files were cache hits. If context seems stale, delete temp_inbox_files/ to force refresh.');
+  }
+  // Missing API keys
+  if (!process.env.OPENAI_API_KEY) tips.push('OPENAI_API_KEY not set; memo uses placeholder. Add key for full synthesis.');
+  if (!process.env.GH_PAT) tips.push('GH_PAT not set; collection skipped (dry-run). Add token to collect inbox files.');
+  return tips;
+}
