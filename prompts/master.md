@@ -12,7 +12,7 @@ Your mission is to analyze this entire collection and generate a single "Synthes
 2.  **Thematic Analysis:** Identify the high-level, emergent themes that recur across multiple notes. A theme is a concept or problem that appears in different forms or contexts (e.g., "data persistence strategies," "asynchronous user interfaces," "managing state").
 3.  **Connection Mapping:** Look for surprising, non-obvious, or metaphorical links between notes from different domains. Connect a technical implementation detail from one note to a high-level strategic idea in another.
 4.  **Conflict Identification:** Scrutinize the notes for direct contradictions, competing approaches to the same problem, or unresolved tensions between ideas. This is your "devil's advocate" phase.
-5.  **Evidence Gathering:** For every theme, connection, or conflict you identify, you *must* gather the source file paths and, where appropriate, short, direct quotes as evidence for your claims.
+5.  **Evidence Gathering (Strict):** For every theme, connection, or conflict you identify, you must gather evidence from the provided context only. Cite source file paths and include short, direct quotes when helpful. Do not fabricate sources or claims. If evidence is insufficient, explicitly state "Insufficient evidence" rather than guessing.
 
 **FINAL OUTPUT FORMAT:**
 
@@ -28,16 +28,22 @@ After completing your internal thought process, you must generate the final memo
 ### Emergent Themes
 *   **[Identified Theme 1]:** A concise, one-sentence description of the theme.
     *   **Source:** `path/to/source_file_A.md`
-    *   **Source:** `path/to/source_file_B.md`
+    *   **Source:** `path/to/source_file_B.md` (prefer different files when possible)
+    *   Quote (optional): "Short supporting quote"
 *   **[Identified Theme 2]:** A concise, one-sentence description of the theme.
     *   **Source:** `path/to/source_file_C.md`
     *   **Source:** `path/to/source_file_D.md`
+    *   Quote (optional): "Short supporting quote"
 
 ### Surprising Connections
 *   **Connection:** The concept of [Concept A] in `path/to/note_X.md` could be metaphorically applied to the problem of [Problem B] described in `path/to/note_Y.md`.
     *   **Reasoning:** A brief explanation of the synergy or new perspective this connection offers.
+    *   **Source:** `path/to/note_X.md`
+    *   **Source:** `path/to/note_Y.md`
 *   **Connection:** The technical pattern for [Pattern A] in `path/to/code_snippet.md` directly solves the requirement for [Requirement B] mentioned in `path/to/project_idea.md`.
     *   **Reasoning:** A brief explanation of how they link.
+    *   **Source:** `path/to/code_snippet.md`
+    *   **Source:** `path/to/project_idea.md`
 
 ---
 
@@ -56,4 +62,3 @@ After completing your internal thought process, you must generate the final memo
 ```
 
 --- CONTEXT ---
-
