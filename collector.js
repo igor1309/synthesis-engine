@@ -1,7 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { promisify } from 'util';
-import OpenAI from 'openai';
 import { buildContext } from './src/context/index.js';
 import { loadConfig } from './src/config/index.js';
 import { createGitHubClient } from './src/github/client.js';
@@ -53,14 +52,42 @@ async function main() {
     summary.contextTokens = Math.floor((contextBytes + 3) / 4);
 
     // 3. Synthesis
-    logger.info('collector: synthesis start', { model: process.env.OPENAI_MODEL || 'gpt-4o-mini' });
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const memoContent = await synthesizeMemo(openai, context, {
-      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-      temperature: Number(process.env.OPENAI_TEMPERATURE || 0.2),
-      projectRoot: process.cwd(),
-      contextMaxTokens: Number(process.env.CONTEXT_MAX_TOKENS || 120000)
-    });
+    let memoContent = '';
+    const dryRun = String(process.env.DRY_RUN || '').toLowerCase() === '1' || String(process.env.DRY_RUN || '').toLowerCase() === 'true';
+    if (dryRun || !process.env.OPENAI_API_KEY) {
+      logger.warn('collector: synthesis skipped', { reason: dryRun ? 'DRY_RUN' : 'missing OPENAI_API_KEY' });
+      memoContent = [
+        '# Synthesis Memo',
+        '',
+        '---',
+        '',
+        '## PART 1: OBJECTIVE SYNTHESIS',
+        '',
+        '### Emergent Themes',
+        '* Skipped (dry-run or no key).',
+        '',
+        '### Surprising Connections',
+        '* Skipped (dry-run or no key).',
+        '',
+        '---',
+        '',
+        '## PART 2: CRITICAL ANALYSIS',
+        '',
+        '### Conflicts & Counter-Arguments',
+        '* Skipped (dry-run or no key).',
+        ''
+      ].join('\n');
+    } else {
+      logger.info('collector: synthesis start', { model: process.env.OPENAI_MODEL || 'gpt-4o-mini' });
+      const { default: OpenAI } = await import('openai');
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      memoContent = await synthesizeMemo(openai, context, {
+        model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+        temperature: Number(process.env.OPENAI_TEMPERATURE || 0.2),
+        projectRoot: process.cwd(),
+        contextMaxTokens: Number(process.env.CONTEXT_MAX_TOKENS || 120000)
+      });
+    }
 
     // 4. Save Output
     await fs.writeFile(OUTPUT_FILE, memoContent);
