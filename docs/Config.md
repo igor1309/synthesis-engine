@@ -3,6 +3,21 @@
 Precedence
 - CLI flags > environment variables > defaults.
 
+Matrix (examples)
+- log level: `--log-level debug` > `LOG_LEVEL=info` > default `info`
+- dry-run: `--dry-run` > `DRY_RUN=0` > default off
+- model: `--openai-model gpt-4o-mini` > `OPENAI_MODEL` > default `gpt-4o-mini`
+- GitHub base URL: `--github-base-url https://ghe.example` > `GITHUB_BASE_URL` > undefined
+- OpenAI base URL: `--openai-base-url https://oai.example` > `OPENAI_BASE_URL` > undefined
+- concurrency: `--github-concurrency 4` > `GITHUB_CONCURRENCY` > `6`
+
+Examples
+- Prefer CLI for ad-hoc runs:
+  - `node collector.js --dry-run --log-level debug --github-concurrency 4`
+- Prefer `.env`/secrets in CI:
+  - `LOG_LEVEL=info`, `OPENAI_MODEL=gpt-4o-mini`, `GITHUB_CONCURRENCY=6`
+  - Override with workflow inputs if needed.
+
 Secrets
 - Never commit `.env` files. The agent must never modify `.env` or `.env.local`.
 

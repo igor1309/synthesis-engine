@@ -12,6 +12,8 @@
 - Config/security: GHE and OpenAI base URLs; proxy envs; secret redaction; docs/Config.md; Troubleshooting guide; README links.
 - Summary UX: versioned schema; settings recorded; `npm run summary` CLI; per-repo table; artifact links; compact Errors section.
 - Per-repo errors: capture non-404 list/fetch errors with samples; `--fail-on-error` option; tests and docs.
+ - CI/workflows: dogfooded reusable agent workflow from generate-memo; added fail-on-error input; preserved commit step.
+ - Config/docs: added precedence matrix and examples; integration redaction test covering step summary and run summary.
 
 ## 2025-09-12
 
