@@ -1,26 +1,16 @@
 # Collector.js Issues
 
-## 1. Incomplete Implementation
-- **Location**: `collector.js:34, 43`
-- **Issue**: Core GitHub API and OpenAI logic are missing
-- **Impact**: Script won't function - contains only placeholder code
-
-## 2. Missing Dependencies
+## 1. OpenAI Synthesis Not Implemented
 - **Location**: `collector.js`
-- **Issue**: References `scripts/repo2md.sh` script that may not exist
-- **Location**: `collector.js`
-- **Issue**: Requires `config/repos.txt` file with no validation
-- **Impact**: Runtime failures if files missing
+- **Issue**: AI synthesis remains a placeholder; no API call/logic yet
+- **Impact**: End-to-end memo generation is incomplete
 
-## 3. Error Handling Gaps
-- **Location**: `collector.js:11-12`
-- **Issue**: No validation of required environment variables
-- **Location**: `collector.js:39`
-- **Issue**: Shell command execution without error checking
-- **Location**: `collector.js:29`
-- **Issue**: File read without existence check
+## 2. Output Validation Missing
+- **Location**: `.github/workflows/generate-memo.yml`
+- **Issue**: No verification of non-empty `synthesis_memo.md` prior to commit
+- **Impact**: CI could commit empty/placeholder output if synthesis fails
 
-## 4. Test Script Side Effects
-- **Location**: `package.json:scripts.test`
-- **Issue**: `npm test` runs the app (`node collector.js`), causing side effects in CI
-- **Action**: Replace with unit tests (e.g., jest/vitest) and/or a no-op placeholder until tests exist
+## 3. Observability
+- **Location**: pipeline/logging
+- **Issue**: No structured logs or step summary (counts, sizes, timings)
+- **Impact**: Harder to debug and track performance in CI
