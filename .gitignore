@@ -1,6 +1,8 @@
 .DS_Store
 temp_inbox_files/
 artifacts/
+node_modules/
+.cache/
 repo-content.md
 **/*.log
 logs/
