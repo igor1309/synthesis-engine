@@ -88,3 +88,4 @@ jobs:
 Troubleshooting
 - See docs/Troubleshooting.md for common issues (missing inbox, rate limits, invalid tokens, empty memo, CI failures) and fixes.
 - Enterprise/proxy: set `GITHUB_BASE_URL` for GitHub Enterprise; use `HTTP_PROXY/HTTPS_PROXY` as needed. For OpenAI-compatible endpoints, set `OPENAI_BASE_URL`.
+ - Citations: by default, validator requires at least one `Source:` citation when context is non-empty. Configure via `MEMO_MIN_CITATIONS` or `npm run memo:validate -- --min-citations <n>`.

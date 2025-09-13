@@ -4,11 +4,12 @@ import path from 'path';
 import { validateMemoFile } from '../src/ai/validateMemo.js';
 
 function parseArgs(argv) {
-  const out = { file: 'synthesis_memo.md', runSummary: null };
+  const out = { file: 'synthesis_memo.md', runSummary: null, minCitations: null };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--file' && argv[i + 1]) { out.file = argv[++i]; continue; }
     if (a === '--run-summary' && argv[i + 1]) { out.runSummary = argv[++i]; continue; }
+    if (a === '--min-citations' && argv[i + 1]) { out.minCitations = Number(argv[++i]); continue; }
   }
   return out;
 }
@@ -46,7 +47,8 @@ async function main() {
     allowPlaceholder = true;
   }
 
-  const res = await validateMemoFile(args.file, { requireItems, allowPlaceholder });
+  const minCitations = (args.minCitations != null) ? args.minCitations : (Number(process.env.MEMO_MIN_CITATIONS || 1));
+  const res = await validateMemoFile(args.file, { requireItems, allowPlaceholder, minCitations });
   if (!res.ok) {
     console.error('Memo validation failed:');
     for (const e of res.errors) console.error(' - ' + e);
@@ -62,4 +64,3 @@ async function main() {
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
-

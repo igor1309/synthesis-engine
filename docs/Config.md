@@ -35,6 +35,7 @@ Environment variables
   - `OPENAI_RETRIES` — default `4`
   - `OPENAI_BASE_DELAY_MS` — base backoff delay (ms), default `400`
   - `OPENAI_BASE_URL` — compatible base URL (optional)
+  - `MEMO_MIN_CITATIONS` — minimum required `Source:` citations when context is non-empty (default `1`)
 - Logging/behavior
   - `LOG_LEVEL` — `info|debug|warn|error`
   - `DRY_RUN` — `1|true` to skip network calls
@@ -50,6 +51,7 @@ CLI flags
 - `--github-base-url <url>`
 - `--openai-base-url <url>`
 - `--github-concurrency <num>`
+ - `--min-citations <num>`
  - `--fail-on-error`
 
 Troubleshooting

@@ -8,6 +8,7 @@ export function validateMemoContent(md, options = {}) {
   const requireSections = options.requireSections !== false;
   const requireItems = options.requireItems ?? false;
   const allowPlaceholder = options.allowPlaceholder ?? false;
+  const minCitations = options.minCitations ?? Number(process.env.MEMO_MIN_CITATIONS || 1);
 
   const hasHeader = /(^|\n)#\s*Synthesis Memo\s*(\n|$)/m.test(text);
   if (!hasHeader) errors.push('Missing "# Synthesis Memo" header');
@@ -38,10 +39,10 @@ export function validateMemoContent(md, options = {}) {
   // Separator presence
   if (!/^---\s*$/m.test(text)) warnings.push('Missing horizontal separator (---) between parts');
 
-  // Citations basic check when content is expected
-  if (requireItems) {
-    const hasSource = /\*\*Source:\*\*|\*\*Source:\s*`[^`]+`/i.test(themes + '\n' + connections);
-    if (!hasSource) warnings.push('No "Source:" citations found in PART 1');
+  // Citations requirement
+  if (requireItems && minCitations > 0) {
+    const count = countCitations(text);
+    if (count < minCitations) errors.push(`Insufficient citations: found ${count}, expected at least ${minCitations}`);
   }
 
   return { ok: errors.length === 0, errors, warnings };
@@ -75,3 +76,20 @@ function hasBullet(section, allowPlaceholder) {
   return true;
 }
 
+function countCitations(md) {
+  // Count "Source:" occurrences in PART 1
+  const part1 = extractSectionByRe(md, /^##\s*PART\s*1:\s*OBJECTIVE\s*SYNTHESIS\s*$/mi);
+  if (!part1) return 0;
+  const re = /\*\*Source:\*\*|\*\*Source:\s*`[^`]+`/g;
+  const m = part1.match(re);
+  return m ? m.length : 0;
+}
+
+function extractSectionByRe(text, reHeading) {
+  const m = reHeading.exec(text);
+  if (!m) return '';
+  const start = m.index + m[0].length;
+  const rest = text.slice(start);
+  const next = /^##\s+/mi.exec(rest);
+  return (next ? rest.slice(0, next.index) : rest).trim();
+}
