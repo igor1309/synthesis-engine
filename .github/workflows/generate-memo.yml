@@ -47,11 +47,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ ! -s synthesis_memo.md ]; then
-            echo "❌ Memo missing or empty" >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-          echo "✅ Memo present: $(wc -c < synthesis_memo.md) bytes" >> "$GITHUB_STEP_SUMMARY"
+          npm run memo:validate -- --file synthesis_memo.md
+          echo "✅ Memo validated" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit and push the new memo
         if: github.ref == 'refs/heads/trunk'

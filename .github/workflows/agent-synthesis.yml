@@ -90,11 +90,8 @@ jobs:
           MEMO_PATH: ${{ inputs['memo-path'] }}
         run: |
           set -euo pipefail
-          if [ ! -s "$MEMO_PATH" ]; then
-            echo "❌ Memo missing or empty at $MEMO_PATH" >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-          echo "✅ Memo present: $(wc -c < "$MEMO_PATH") bytes" >> "$GITHUB_STEP_SUMMARY"
+          npm run memo:validate -- --file "$MEMO_PATH"
+          echo "✅ Memo validated" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Set outputs
         id: set-outputs
@@ -120,4 +117,3 @@ jobs:
           path: |
             artifacts/
             ${{ inputs['memo-path'] }}
-
