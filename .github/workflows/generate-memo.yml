@@ -1,73 +1,34 @@
 name: Generate Synthesis Memo
 
 on:
-  # Run every Sunday at 05:00 UTC
   schedule:
     - cron: "0 5 * * 0"
-  # Run manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+  synthesize:
+    uses: igor1309/synthesis-engine/.github/workflows/agent-synthesis.yml@trunk
+    with:
+      node-version: '20'
+      memo-path: 'synthesis_memo.md'
+      dry-run: false
+      log-level: info
+      fail-on-error: false
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+  commit:
+    needs: synthesize
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/trunk'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20" # Use a current LTS version
-
-      - name: Cache node modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run collector and synthesis script
-        shell: bash
-        continue-on-error: false
-        run: |
-          set -euo pipefail
-          node collector.js
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-
-      - name: Validate memo output
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm run memo:validate -- --file synthesis_memo.md
-          echo "✅ Memo validated" >> "$GITHUB_STEP_SUMMARY"
-
       - name: Commit and push the new memo
-        if: github.ref == 'refs/heads/trunk'
         run: |
           git config --global user.name 'Synthesis Engine Bot'
           git config --global user.email 'bot@users.noreply.github.com'
           git add synthesis_memo.md
-          # Only commit if there are changes to the file
           git diff --staged --quiet || git commit -m "docs: generate new synthesis memo for $(date -u +'%Y-%m-%d')"
           git push
-
-      - name: Add failure summary
-        if: failure()
-        run: |
-          echo "❌ Synthesis memo generation failed. Check previous steps for details." >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload artifacts on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: synthesis-artifacts
-          path: artifacts/

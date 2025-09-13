@@ -23,6 +23,11 @@ on:
         required: false
         type: string
         default: 'info'
+      fail-on-error:
+        description: Exit non-zero if per-repo errors occurred
+        required: false
+        type: boolean
+        default: false
       github-base-url:
         description: GitHub Enterprise base URL (optional)
         required: false
@@ -98,6 +103,7 @@ jobs:
           GITHUB_BASE_URL: ${{ inputs['github-base-url'] }}
           OPENAI_BASE_URL: ${{ inputs['openai-base-url'] }}
           GITHUB_CONCURRENCY: ${{ inputs['github-concurrency'] }}
+          FAIL_ON_ERROR: ${{ inputs['fail-on-error'] }}
         run: |
           set -euo pipefail
           node collector.js
