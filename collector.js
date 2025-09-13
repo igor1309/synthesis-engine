@@ -193,6 +193,13 @@ async function main() {
     const stepMd = lines.join('\n') + '\n';
     await logger.writeStepSummary(stepMd);
     try { await fs.writeFile(path.join(runDir, 'step-summary.md'), stepMd); } catch {}
+    // Optional fail-on-error: set exit code after artifacts are written
+    const failOnError = String(process.env.FAIL_ON_ERROR || '').toLowerCase();
+    const shouldFail = failOnError === '1' || failOnError === 'true';
+    if (shouldFail && (t.errorCount || 0) > 0) {
+      summary.status = 'failed';
+      process.exitCode = 2;
+    }
   } catch (error) {
     const code = classifyError(error);
     logger.error('collector: error', { error: String(error?.message || error), code });

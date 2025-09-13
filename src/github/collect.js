@@ -42,14 +42,15 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
   const inboxPath = spec.inboxPath || 'inbox';
 
   const ctl = { limit: options.concurrency || 6, rateLimited: false, lastWaitMs: 0, retries: { list: 0, fetch: 0, waitMs: 0 } };
-  const { entries, warnings } = await listTreeRecursive(octokit, spec.owner, spec.repo, inboxPath, ref, ctl);
+  const { entries, warnings, errors: listErrors } = await listTreeRecursive(octokit, spec.owner, spec.repo, inboxPath, ref, ctl);
   const files = entries.filter((e) => e.type === 'file' && isMarkdown(e.path));
 
   let cacheHits = 0;
   let cacheMisses = 0;
   let downloadedBytes = 0;
   let warnCount = Array.isArray(warnings) ? warnings.length : 0;
-  let errorCount = 0;
+  let errorCount = Array.isArray(listErrors) ? listErrors.length : 0;
+  const errors = Array.isArray(listErrors) ? listErrors.slice() : [];
 
   const tasks = files.map((file) => async () => {
     const cacheKey = cacheKeyFor(spec, file.path, ref);
@@ -69,18 +70,18 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
       }
     }
 
-    const content = await getFileContent(octokit, spec.owner, spec.repo, file.path, ref, ctl);
-    await ensureDir(path.dirname(targetPath));
-    await writeFileAtomic(targetPath, content);
-    saved.push(targetPath);
-    if (prevSha && prevSha === file.sha) {
-      // Cache said unchanged but local missing -> treat as hit for metrics? We count as miss to reflect download.
+    try {
+      const content = await getFileContent(octokit, spec.owner, spec.repo, file.path, ref, ctl);
+      await ensureDir(path.dirname(targetPath));
+      await writeFileAtomic(targetPath, content);
+      saved.push(targetPath);
       cacheMisses++;
-    } else {
-      cacheMisses++;
+      downloadedBytes += Buffer.byteLength(content, 'utf-8');
+      cacheUpdates[cacheKey] = { sha: file.sha, size: file.size };
+    } catch (err) {
+      errorCount++;
+      errors.push(sampleError('FETCH_ERROR', file.path, err));
     }
-    downloadedBytes += Buffer.byteLength(content, 'utf-8');
-    cacheUpdates[cacheKey] = { sha: file.sha, size: file.size };
   });
 
   await runAdaptive(tasks, ctl);
@@ -99,6 +100,7 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
       retryWaitMs: ctl.retries.waitMs,
       warnCount,
       errorCount,
+      errors: errors.slice(0, 5),
     }
   };
 }
@@ -149,6 +151,7 @@ async function listTreeRecursive(octokit, owner, repo, basePath, ref, ctl) {
   // Use Contents API recursion via directories
   const out = [];
   let warnings = [];
+  let errors = [];
   async function walk(p) {
     try {
       const res = await withRetry(
@@ -180,11 +183,12 @@ async function listTreeRecursive(octokit, owner, repo, basePath, ref, ctl) {
         if (p === basePath) warnings.push({ code: 'INBOX_NOT_FOUND', path: basePath });
         return;
       }
-      throw err;
+      errors.push(sampleError('LIST_ERROR', p, err));
+      return;
     }
   }
   await walk(basePath);
-  return { entries: out, warnings };
+  return { entries: out, warnings, errors };
 }
 
 async function runAdaptive(tasks, ctl) {
@@ -232,4 +236,10 @@ function aggregateTotals(perRepo) {
     t.retryWaitMs += r.retryWaitMs || 0;
   }
   return t;
+}
+
+function sampleError(code, pathStr, err) {
+  const status = err?.status || err?.response?.status;
+  const msg = String(err?.message || err || '').slice(0, 160);
+  return { code, status: status || null, path: pathStr, msg };
 }

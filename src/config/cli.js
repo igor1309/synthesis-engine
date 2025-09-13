@@ -11,6 +11,7 @@ export function loadCliOverrides(argv = process.argv) {
   if (m['github-base-url']) process.env.GITHUB_BASE_URL = m['github-base-url'];
   if (m['openai-base-url']) process.env.OPENAI_BASE_URL = m['openai-base-url'];
   if (m['github-concurrency'] != null) process.env.GITHUB_CONCURRENCY = String(m['github-concurrency']);
+  if (m['fail-on-error'] !== undefined) process.env.FAIL_ON_ERROR = truthy(m['fail-on-error']) ? '1' : '';
 }
 
 export function parseArgs(argv) {
@@ -28,6 +29,9 @@ export function parseArgs(argv) {
         if (next && !next.startsWith('--')) { out[key] = Number(next); i++; }
         break;
       case 'dry-run':
+        out[key] = true;
+        break;
+      case 'fail-on-error':
         out[key] = true;
         break;
       default:

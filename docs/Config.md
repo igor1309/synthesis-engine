@@ -23,6 +23,7 @@ Environment variables
 - Logging/behavior
   - `LOG_LEVEL` — `info|debug|warn|error`
   - `DRY_RUN` — `1|true` to skip network calls
+  - `FAIL_ON_ERROR` — `1|true` to exit non-zero if any per-repo errors occurred
 
 CLI flags
 - `--log-level info|debug|warn|error`
@@ -34,7 +35,7 @@ CLI flags
 - `--github-base-url <url>`
 - `--openai-base-url <url>`
 - `--github-concurrency <num>`
+ - `--fail-on-error`
 
 Troubleshooting
 - See `docs/Troubleshooting.md` for common issues.
-
