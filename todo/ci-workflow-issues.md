@@ -18,3 +18,7 @@
 - **Issue**: No verification that collector.js produces expected output
 - **Impact**: May commit empty or malformed files
 
+## 5. Tests Invoke App
+- **Location**: `package.json:scripts.test`
+- **Issue**: `npm test` runs `node collector.js`; tests should be isolated
+- **Action**: Add real tests and configure workflow to run them; avoid running the app in tests

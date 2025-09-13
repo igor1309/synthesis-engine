@@ -20,3 +20,7 @@
 - **Location**: `collector.js:29`
 - **Issue**: File read without existence check
 
+## 4. Test Script Side Effects
+- **Location**: `package.json:scripts.test`
+- **Issue**: `npm test` runs the app (`node collector.js`), causing side effects in CI
+- **Action**: Replace with unit tests (e.g., jest/vitest) and/or a no-op placeholder until tests exist
