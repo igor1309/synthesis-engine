@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import { estimateTokensFromText, splitContextByHeadings } from './token.js';
+import { withRetry } from '../utils/retry.js';
 
 export async function loadMasterPrompt(projectRoot) {
   const fp = `${projectRoot}/prompts/master.md`;
@@ -54,13 +55,15 @@ function buildMessages(masterPrompt, context) {
 
 async function callChat(openai, { model, temperature, messages }) {
   // Support both chat.completions and responses SDKs by feature-detecting
+  const tries = Number(process.env.OPENAI_RETRIES || 4);
+  const baseMs = Number(process.env.OPENAI_BASE_DELAY_MS || 400);
   if (openai?.chat?.completions?.create) {
-    const res = await openai.chat.completions.create({ model, temperature, messages });
+    const res = await withRetry(() => openai.chat.completions.create({ model, temperature, messages }), { tries, baseMs });
     const text = res?.choices?.[0]?.message?.content || '';
     return text;
   }
   if (openai?.responses?.create) {
-    const res = await openai.responses.create({ model, temperature, input: messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n') });
+    const res = await withRetry(() => openai.responses.create({ model, temperature, input: messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n') }), { tries, baseMs });
     const text = res?.output_text || '';
     return text;
   }

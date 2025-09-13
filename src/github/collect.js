@@ -117,7 +117,7 @@ function isMarkdown(p) {
 }
 
 async function getFileContent(octokit, owner, repo, filePath, ref) {
-  const res = await withRetry(() => octokit.repos.getContent({ owner, repo, path: filePath, ref }), { tries: 4 });
+  const res = await withRetry(() => octokit.repos.getContent({ owner, repo, path: filePath, ref }), { tries: Number(process.env.GITHUB_RETRIES || 4) });
   if (!Array.isArray(res.data) && res.data && res.data.type === 'file' && res.data.content) {
     const buff = Buffer.from(res.data.content, 'base64');
     return buff.toString('utf-8');
@@ -136,7 +136,7 @@ async function listTreeRecursive(octokit, owner, repo, basePath, ref) {
   let warnings = [];
   async function walk(p) {
     try {
-      const res = await withRetry(() => octokit.repos.getContent({ owner, repo, path: p, ref }), { tries: 4 });
+      const res = await withRetry(() => octokit.repos.getContent({ owner, repo, path: p, ref }), { tries: Number(process.env.GITHUB_RETRIES || 4) });
       if (Array.isArray(res.data)) {
         for (const item of res.data) {
           if (item.type === 'dir') {
