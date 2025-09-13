@@ -75,16 +75,18 @@ export async function nodeBuildContext(files, options = {}) {
     out += lang ? `${fence}${lang}\n` : `${fence}\n`;
 
     const content = await fs.readFile(p, 'utf-8');
+    const normalized = content.replace(/\r?\n/g, '\n');
     if ((linesHead > 0 || linesTail > 0) && lines > (linesHead + linesTail)) {
-      const parts = content.split(/\r?\n/);
+      const parts = normalized.replace(/\n$/, '').split('\n');
       const head = parts.slice(0, Math.min(linesHead, parts.length));
       const tail = parts.slice(Math.max(parts.length - linesTail, 0));
-      out += head.join('\n') + `\n\n... [truncated ${parts.length - head.length - tail.length} lines]\n\n` + tail.join('\n') + '\n';
+      const truncatedCount = lines - head.length - tail.length;
+      out += head.join('\n') + `\n\n... [truncated ${truncatedCount} lines]\n\n` + tail.join('\n') + '\n';
     } else {
-      out += content.replace(/\r?\n/g, '\n') + '\n';
+      out += normalized + (normalized.endsWith('\n') ? '' : '\n');
     }
 
-    out += `${fence}\n\n`;
+    out += `\n${fence}\n\n`;
   }
 
   out += '<!-- END OF SNAPSHOT -->\n';
@@ -178,4 +180,3 @@ function codeSpan(s) {
   const ticks = '`'.repeat(Math.max(max + 1, 1));
   return `${ticks}${s}${ticks}`;
 }
-
