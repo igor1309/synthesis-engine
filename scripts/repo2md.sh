@@ -31,13 +31,13 @@
 #
 # ЗАМЕТКИ
 #   • Порядок файлов в выходе = порядок аргументов. Предупреждения/игнор — в stderr.
-#   • Выходной файл перезаписывается: ./repo-content.md
+#   • Пишет результат в STDOUT (файл не создаётся)
 # =============================================================================
 
 set -euo pipefail
 
-OUT="repo-content.md"
-TMP="$(mktemp "${OUT}.tmp.XXXXXXXX")"
+OUT="repo-content.md" # исторический артефакт; используется только для пропуска совпадающих входов
+TMP="$(mktemp ".repo2md.tmp.XXXXXXXX")"
 cleanup() { rm -f "$TMP"; }
 trap cleanup EXIT
 
@@ -332,5 +332,5 @@ done
 printf '<!-- END OF SNAPSHOT -->\n' >> "$TMP"
 
 # --- Finalize ----------------------------------------------------------------
-mv "$TMP" "$OUT"
+cat "$TMP"
 trap - EXIT

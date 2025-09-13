@@ -1,6 +1,5 @@
 # BuildContext TODOs
 - Feature-flag to set default strategy
-- Refactor `scripts/repo2md.sh` to output to stdout
 - Control truncation via env vars LINES_HEAD and LINES_TAIL
 
 - Add size/token cap guard with map-reduce synthesis when exceeded
