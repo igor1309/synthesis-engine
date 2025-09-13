@@ -28,10 +28,11 @@ export async function synthesizeMemo(openai, context, options = {}) {
   const contextTokens = estimateTokensFromText(context);
   const maxContextTokens = options.contextMaxTokens || Number(process.env.CONTEXT_MAX_TOKENS || 120000);
 
+  const oaiStats = { retries: 0, waitMs: 0 };
   if (contextTokens <= maxContextTokens) {
     const messages = buildMessages(prompt, context);
-    const out = await callChat(openai, { model, temperature, messages });
-    return { content: validateMemo(out), meta: { model, temperature, contextTokens, maxContextTokens, chunked: false, chunks: 1 } };
+    const out = await callChat(openai, { model, temperature, messages }, oaiStats);
+    return { content: validateMemo(out), meta: { model, temperature, contextTokens, maxContextTokens, chunked: false, chunks: 1, openaiRetries: oaiStats.retries, openaiWaitMs: oaiStats.waitMs } };
   }
 
   // Map-Reduce flow
@@ -40,10 +41,10 @@ export async function synthesizeMemo(openai, context, options = {}) {
   const partials = [];
   for (const chunk of chunks) {
     const messages = buildMessages(prompt, chunk);
-    const out = await callChat(openai, { model, temperature, messages });
+    const out = await callChat(openai, { model, temperature, messages }, oaiStats);
     partials.push(validatePartial(out));
   }
-  return { content: mergePartials(partials), meta: { model, temperature, contextTokens, maxContextTokens, chunked: true, chunks: chunks.length } };
+  return { content: mergePartials(partials), meta: { model, temperature, contextTokens, maxContextTokens, chunked: true, chunks: chunks.length, openaiRetries: oaiStats.retries, openaiWaitMs: oaiStats.waitMs } };
 }
 
 function buildMessages(masterPrompt, context) {
@@ -53,17 +54,17 @@ function buildMessages(masterPrompt, context) {
   ];
 }
 
-async function callChat(openai, { model, temperature, messages }) {
+async function callChat(openai, { model, temperature, messages }, stats) {
   // Support both chat.completions and responses SDKs by feature-detecting
   const tries = Number(process.env.OPENAI_RETRIES || 4);
   const baseMs = Number(process.env.OPENAI_BASE_DELAY_MS || 400);
   if (openai?.chat?.completions?.create) {
-    const res = await withRetry(() => openai.chat.completions.create({ model, temperature, messages }), { tries, baseMs });
+    const res = await withRetry(() => openai.chat.completions.create({ model, temperature, messages }), { tries, baseMs, onRetry: (_e, _a, waitMs) => { if (stats) { stats.retries++; stats.waitMs += waitMs; } } });
     const text = res?.choices?.[0]?.message?.content || '';
     return text;
   }
   if (openai?.responses?.create) {
-    const res = await withRetry(() => openai.responses.create({ model, temperature, input: messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n') }), { tries, baseMs });
+    const res = await withRetry(() => openai.responses.create({ model, temperature, input: messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n') }), { tries, baseMs, onRetry: (_e, _a, waitMs) => { if (stats) { stats.retries++; stats.waitMs += waitMs; } } });
     const text = res?.output_text || '';
     return text;
   }

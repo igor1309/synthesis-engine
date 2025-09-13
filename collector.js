@@ -130,7 +130,11 @@ async function main() {
       generatedAt: new Date().toISOString(),
       summary,
       metrics: { totals: metrics.totals || {}, perRepo: metrics.repos || [] },
-      synthesis: summary.synthesis || null
+      synthesis: summary.synthesis || null,
+      retries: {
+        github: summarizeGithubRetries(metrics),
+        openai: summary.synthesis ? { retries: summary.synthesis.openaiRetries || 0, waitMs: summary.synthesis.openaiWaitMs || 0 } : null
+      }
     };
     await fs.writeFile(path.join(runDir, 'run-summary.json'), JSON.stringify(runSummary, null, 2));
 
@@ -148,6 +152,14 @@ async function main() {
       lines.push(`- md files: ${t.mdFiles} · downloaded: ${t.downloadedCount} · bytes: ${human(t.downloadedBytes || 0)}`);
       lines.push(`- cache: hits ${t.cacheHits} / misses ${t.cacheMisses} (hit rate ${(ratio*100).toFixed(1)}%)`);
       lines.push(`- issues: warnings ${t.warnCount || 0} · errors ${t.errorCount || 0}`);
+      const ghRetry = summarizeGithubRetries(metrics);
+      if (ghRetry.list || ghRetry.fetch) {
+        const wsec = (ghRetry.waitMs/1000).toFixed(1);
+        lines.push(`- retries (GitHub): list ${ghRetry.list} · fetch ${ghRetry.fetch} · wait ~${wsec}s`);
+      }
+      if (summary.synthesis && (summary.synthesis.openaiRetries || 0) > 0) {
+        lines.push(`- retries (OpenAI): calls ${summary.synthesis.openaiRetries} · wait ~${(summary.synthesis.openaiWaitMs/1000).toFixed(1)}s`);
+      }
       if (summary.contextBytes !== undefined) lines.push(`- context: files ${summary.contextFiles || 0} · size ${human(summary.contextBytes)} · est tokens ~${summary.contextTokens || 0}`);
       if (summary.synthesis) lines.push(`- synthesis: model ${summary.synthesis.model} · chunked ${summary.synthesis.chunked ? 'yes' : 'no'} · chunks ${summary.synthesis.chunks}`);
       if (summary.durationMs !== undefined) lines.push(`- duration: ${(summary.durationMs/1000).toFixed(1)}s`);
@@ -214,4 +226,16 @@ function remediationTips(metrics, summary) {
   if (!process.env.OPENAI_API_KEY) tips.push('OPENAI_API_KEY not set; memo uses placeholder. Add key for full synthesis.');
   if (!process.env.GH_PAT) tips.push('GH_PAT not set; collection skipped (dry-run). Add token to collect inbox files.');
   return tips;
+}
+
+function summarizeGithubRetries(metrics) {
+  const m = metrics || {};
+  const per = m.repos || [];
+  let list = 0, fetch = 0, waitMs = 0;
+  for (const r of per) {
+    list += r.retryList || 0;
+    fetch += r.retryFetch || 0;
+    waitMs += r.retryWaitMs || 0;
+  }
+  return { list, fetch, waitMs };
 }

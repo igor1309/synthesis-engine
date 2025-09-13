@@ -58,10 +58,10 @@ async function run() {
   assert.equal(res.metrics.totals.downloadedCount, 2, 'downloaded count should be 2');
   // Expect at least one retry backoff (~400ms default); allow margin
   assert(elapsed >= 200, 'expected elapsed time to include retry backoff');
+  assert(res.metrics.totals.retryFetch >= 1 || res.metrics.totals.retryList >= 1, 'expected some retry counters');
 
   await rimraf(tmpRoot);
   console.log('adaptive-concurrency.test.js: OK');
 }
 
 run().catch((e) => { console.error(e); process.exit(1); });
-

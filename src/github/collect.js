@@ -41,7 +41,7 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
   const ref = spec.ref || undefined;
   const inboxPath = spec.inboxPath || 'inbox';
 
-  const ctl = { limit: options.concurrency || 6, rateLimited: false, lastWaitMs: 0 };
+  const ctl = { limit: options.concurrency || 6, rateLimited: false, lastWaitMs: 0, retries: { list: 0, fetch: 0, waitMs: 0 } };
   const { entries, warnings } = await listTreeRecursive(octokit, spec.owner, spec.repo, inboxPath, ref, ctl);
   const files = entries.filter((e) => e.type === 'file' && isMarkdown(e.path));
 
@@ -94,6 +94,9 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
       cacheMisses,
       downloadedBytes,
       downloadedCount: saved.length,
+      retryList: ctl.retries.list,
+      retryFetch: ctl.retries.fetch,
+      retryWaitMs: ctl.retries.waitMs,
       warnCount,
       errorCount,
     }
@@ -122,8 +125,10 @@ async function getFileContent(octokit, owner, repo, filePath, ref, ctl) {
     () => octokit.repos.getContent({ owner, repo, path: filePath, ref }),
     {
       tries: Number(process.env.GITHUB_RETRIES || 4),
-      onRetry: (err, attempt, waitMs) => {
+      onRetry: (err, _attempt, waitMs) => {
         const status = err?.status || err?.response?.status;
+        ctl.retries.fetch++;
+        ctl.retries.waitMs += waitMs;
         if (status === 403 || status === 429) { ctl.rateLimited = true; ctl.lastWaitMs = Math.max(ctl.lastWaitMs, waitMs); }
       }
     }
@@ -150,8 +155,10 @@ async function listTreeRecursive(octokit, owner, repo, basePath, ref, ctl) {
         () => octokit.repos.getContent({ owner, repo, path: p, ref }),
         {
           tries: Number(process.env.GITHUB_RETRIES || 4),
-          onRetry: (err, attempt, waitMs) => {
+          onRetry: (err, _attempt, waitMs) => {
             const status = err?.status || err?.response?.status;
+            ctl.retries.list++;
+            ctl.retries.waitMs += waitMs;
             if (status === 403 || status === 429) { ctl.rateLimited = true; ctl.lastWaitMs = Math.max(ctl.lastWaitMs, waitMs); }
           }
         }
@@ -209,7 +216,7 @@ async function runAdaptive(tasks, ctl) {
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
 function aggregateTotals(perRepo) {
-  const t = { filesConsidered: 0, mdFiles: 0, cacheHits: 0, cacheMisses: 0, downloadedBytes: 0, downloadedCount: 0, durationMs: 0, warnCount: 0, errorCount: 0 };
+  const t = { filesConsidered: 0, mdFiles: 0, cacheHits: 0, cacheMisses: 0, downloadedBytes: 0, downloadedCount: 0, durationMs: 0, warnCount: 0, errorCount: 0, retryList: 0, retryFetch: 0, retryWaitMs: 0 };
   for (const r of perRepo) {
     t.filesConsidered += r.filesConsidered || 0;
     t.mdFiles += r.mdFiles || 0;
@@ -220,6 +227,9 @@ function aggregateTotals(perRepo) {
     t.durationMs += r.durationMs || 0;
     t.warnCount += r.warnCount || 0;
     t.errorCount += r.errorCount || 0;
+    t.retryList += r.retryList || 0;
+    t.retryFetch += r.retryFetch || 0;
+    t.retryWaitMs += r.retryWaitMs || 0;
   }
   return t;
 }

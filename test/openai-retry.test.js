@@ -19,8 +19,8 @@ async function run() {
   process.env.OPENAI_RETRIES = '5';
   const out = await synthesizeMemo(client, ctx, { contextMaxTokens: 999999, model: 'test' });
   assert(out && out.content && out.content.includes('# Synthesis Memo'));
+  assert(out.meta && out.meta.openaiRetries >= 2, 'expected openai retry count');
   console.log('openai-retry.test.js: OK');
 }
 
 run().catch((e) => { console.error(e); process.exit(1); });
-
