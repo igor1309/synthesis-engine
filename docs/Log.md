@@ -16,9 +16,10 @@
 - Memo validation: added structural validator and CLI; integrated into CI (generate-memo.yml, agent-synthesis.yml); tests added.
 - Hardening: CLI overrides for env, error codes in logs/summary, GitHub request timeouts, retry/backoff utility (used for GitHub listing/content), .env.example, README flags.
 - Observability enrichment: versioned run-summary with synthesis metadata; enriched step summary totals/ratios; documented schema in README.
- - Observability enrichment: added warn/error counters, remediation tips; versioned schema docs.
- - Resilience: OpenAI retries/backoff + GitHub retries; adaptive concurrency on 403/429; tracked retry counters/wait and surfaced in summaries; tests added.
- - Config/security: GHE base URL and OpenAI base URL support; proxy envs; secret redaction in logs/summary; Troubleshooting doc; README links.
+- Observability enrichment: added warn/error counters, remediation tips; versioned schema docs.
+- Resilience: OpenAI retries/backoff + GitHub retries; adaptive concurrency on 403/429; tracked retry counters/wait and surfaced in summaries; tests added.
+- Config/security: GHE base URL and OpenAI base URL support; proxy envs; secret redaction in logs/summary; Troubleshooting doc; README links.
+ - Run-summary UX: persisted step-summary.md under artifacts; added settings to run-summary; added `npm run summary` CLI for quick terminal overview.
 
 ## 2025-09-12
 
