@@ -1,29 +1,6 @@
 # Top Priorities (Detailed)
 
-1) Config, security, and observability hardening
-- Why
-  - Prevents fragile runs in CI and local; improves debuggability and trustworthiness.
-- Scope
-  - Configuration
-    - Precedence: CLI > env > `package.json` `config` > defaults; add `.env.example` documenting vars.
-    - Add CLI flags (e.g., `--log-level`, `--dry-run`, `--openai-model`, `--context-max-tokens`).
-    - Support enterprise GitHub base URL and proxy; dry-run mode for local tests.
-  - Security
-    - Validate `GH_PAT`, `OPENAI_API_KEY` up front; redact sensitive fields in logs.
-    - Set network timeouts and retry strategy for GitHub/OpenAI calls; optional proxy settings.
-  - Observability
-    - Enrich step summary: totals per-repo, cache hits/misses, error counts, durations.
-    - Persist artifacts under `artifacts/<timestamp>/` (context snapshot, run-summary.json, logs).
-    - Add error/warn counters and standardized error codes; token estimation for context and memo.
-- Deliverables
-  - CLI/flag parsing and config merge; `.env.example` and README sections.
-  - Step summary enhancements; run-summary artifact writer; redaction utilities.
-  - Workflow updates to pass inputs/env and upload artifacts robustly.
-- Acceptance
-  - CI shows enriched step summary with metrics and error counts; artifacts attached on failure.
-  - Misconfiguration fails fast with clear messages; secrets are never written to logs.
-
-2) Observability enrichment
+1) Observability enrichment
 - Why
   - Make runs easy to debug and review by surfacing richer, consistent metrics and summaries.
 - Scope
@@ -36,7 +13,7 @@
 - Acceptance
   - CI shows enriched summary; artifacts include a valid, versioned summary; errors include codes.
 
-3) Resilience: rate limiting and retries
+2) Resilience: rate limiting and retries
 - Why
   - Improves reliability under GitHub 403/429 and OpenAI transient errors; avoids flakiness.
 - Scope
@@ -48,3 +25,15 @@
   - Configurable limits via env/CLI; minimal logs showing retries.
 - Acceptance
   - Simulated 429/5xx recover after retries; severe cases fail fast with clear messages and codes.
+
+3) Config polish and security
+- Why
+  - Finalize configuration surfaces and security posture for varied environments.
+- Scope
+  - Add optional GitHub Enterprise base URL and HTTP(S) proxy support (env/CLI).
+  - Redaction utilities to scrub sensitive values from logs and summaries.
+  - Document precedence and troubleshooting; refine errors with remediation tips.
+- Deliverables
+  - Config parsing for base URL/proxy; redaction helper; docs.
+- Acceptance
+  - Runs succeed behind proxies/enterprise; logs never contain secrets; docs cover common failures.
