@@ -3,15 +3,15 @@
 1) Observability enrichment
 - Why
   - Make runs easy to debug and review by surfacing richer, consistent metrics and summaries.
-- Scope
-  - Expand step summary: per-repo details, totals, cache hit/miss ratios, durations, error/warn counters.
-  - Formalize `artifacts/*/run-summary.json` schema (versioned) and include synthesis metadata (model, token estimates).
-  - Add standardized error codes and brief remediation tips in logs.
+- Scope (remaining)
+  - Add error/warn counters and brief remediation tips in logs and step summary.
+  - Include per-repo error/warn counts in run-summary; keep schema versioned.
+  - Add a tiny schema doc file (docs/run-summary-schema.md) referenced from README.
 - Deliverables
-  - Logger helpers to aggregate and emit metrics; schema doc for run-summary; summary templates.
+  - Logger helpers to aggregate counters; summary template updates; schema doc.
   - Tests for summary writer and schema shape.
 - Acceptance
-  - CI shows enriched summary; artifacts include a valid, versioned summary; errors include codes.
+  - CI shows enriched summary with counters and tips; artifacts include updated schema with counters.
 
 2) Resilience: rate limiting and retries
 - Why

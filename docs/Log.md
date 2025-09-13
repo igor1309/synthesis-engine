@@ -15,6 +15,7 @@
 - Safety rules: AGENTS.md updated to never touch .env/.env.local and prefer explicit staging; dotenv test now uses a temp dir.
 - Memo validation: added structural validator and CLI; integrated into CI (generate-memo.yml, agent-synthesis.yml); tests added.
 - Hardening: CLI overrides for env, error codes in logs/summary, GitHub request timeouts, retry/backoff utility (used for GitHub listing/content), .env.example, README flags.
+ - Observability enrichment: versioned run-summary with synthesis metadata; enriched step summary totals/ratios; documented schema in README.
 
 ## 2025-09-12
 
