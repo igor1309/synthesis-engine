@@ -1,0 +1,16 @@
+{
+    "name": "synthesis-engine",
+    "version": "1.0.0",
+    "description": "Generates a synthesis memo from repository inboxes.",
+    "main": "collector.js",
+    "type": "module",
+    "scripts": {
+      "start": "node collector.js",
+      "lint": "eslint .",
+      "test": "npm run start"
+    },
+    "dependencies": {
+      "@octokit/rest": "^20.1.1",
+      "openai": "^4.67.0"
+    }
+  }
