@@ -41,7 +41,8 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
   const ref = spec.ref || undefined;
   const inboxPath = spec.inboxPath || 'inbox';
 
-  const { entries, warnings } = await listTreeRecursive(octokit, spec.owner, spec.repo, inboxPath, ref);
+  const ctl = { limit: options.concurrency || 6, rateLimited: false, lastWaitMs: 0 };
+  const { entries, warnings } = await listTreeRecursive(octokit, spec.owner, spec.repo, inboxPath, ref, ctl);
   const files = entries.filter((e) => e.type === 'file' && isMarkdown(e.path));
 
   let cacheHits = 0;
@@ -68,7 +69,7 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
       }
     }
 
-    const content = await getFileContent(octokit, spec.owner, spec.repo, file.path, ref);
+    const content = await getFileContent(octokit, spec.owner, spec.repo, file.path, ref, ctl);
     await ensureDir(path.dirname(targetPath));
     await writeFileAtomic(targetPath, content);
     saved.push(targetPath);
@@ -82,7 +83,7 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
     cacheUpdates[cacheKey] = { sha: file.sha, size: file.size };
   });
 
-  await runLimited(tasks, options.concurrency || 6);
+  await runAdaptive(tasks, ctl);
   return {
     saved,
     cacheUpdates,
@@ -116,8 +117,17 @@ function isMarkdown(p) {
   return MARKDOWN_EXTS.has(ext);
 }
 
-async function getFileContent(octokit, owner, repo, filePath, ref) {
-  const res = await withRetry(() => octokit.repos.getContent({ owner, repo, path: filePath, ref }), { tries: Number(process.env.GITHUB_RETRIES || 4) });
+async function getFileContent(octokit, owner, repo, filePath, ref, ctl) {
+  const res = await withRetry(
+    () => octokit.repos.getContent({ owner, repo, path: filePath, ref }),
+    {
+      tries: Number(process.env.GITHUB_RETRIES || 4),
+      onRetry: (err, attempt, waitMs) => {
+        const status = err?.status || err?.response?.status;
+        if (status === 403 || status === 429) { ctl.rateLimited = true; ctl.lastWaitMs = Math.max(ctl.lastWaitMs, waitMs); }
+      }
+    }
+  );
   if (!Array.isArray(res.data) && res.data && res.data.type === 'file' && res.data.content) {
     const buff = Buffer.from(res.data.content, 'base64');
     return buff.toString('utf-8');
@@ -130,13 +140,22 @@ async function getFileContent(octokit, owner, repo, filePath, ref) {
   throw new Error(`Unexpected content response for ${owner}/${repo}:${filePath}`);
 }
 
-async function listTreeRecursive(octokit, owner, repo, basePath, ref) {
+async function listTreeRecursive(octokit, owner, repo, basePath, ref, ctl) {
   // Use Contents API recursion via directories
   const out = [];
   let warnings = [];
   async function walk(p) {
     try {
-      const res = await withRetry(() => octokit.repos.getContent({ owner, repo, path: p, ref }), { tries: Number(process.env.GITHUB_RETRIES || 4) });
+      const res = await withRetry(
+        () => octokit.repos.getContent({ owner, repo, path: p, ref }),
+        {
+          tries: Number(process.env.GITHUB_RETRIES || 4),
+          onRetry: (err, attempt, waitMs) => {
+            const status = err?.status || err?.response?.status;
+            if (status === 403 || status === 429) { ctl.rateLimited = true; ctl.lastWaitMs = Math.max(ctl.lastWaitMs, waitMs); }
+          }
+        }
+      );
       if (Array.isArray(res.data)) {
         for (const item of res.data) {
           if (item.type === 'dir') {
@@ -161,16 +180,33 @@ async function listTreeRecursive(octokit, owner, repo, basePath, ref) {
   return { entries: out, warnings };
 }
 
-async function runLimited(tasks, limit) {
+async function runAdaptive(tasks, ctl) {
   const queue = tasks.slice();
-  const workers = new Array(Math.min(limit, tasks.length)).fill(null).map(async () => {
-    while (queue.length) {
+  let running = 0;
+  const minLimit = 1;
+  async function maybeSpawn() {
+    while (running < Math.max(ctl.limit || 1, minLimit) && queue.length) {
       const fn = queue.shift();
-      await fn();
+      running++;
+      fn().catch(() => { /* errors bubble via upstream retry or throw */ }).finally(async () => {
+        running--;
+      });
     }
-  });
-  await Promise.all(workers);
+  }
+  while (queue.length || running > 0) {
+    if (ctl.rateLimited) {
+      ctl.limit = Math.max(minLimit, Math.floor((ctl.limit || 1) / 2));
+      const wait = Math.min(ctl.lastWaitMs || 1000, 10000);
+      ctl.rateLimited = false; ctl.lastWaitMs = 0;
+      await sleep(wait);
+    }
+    await maybeSpawn();
+    // Small tick
+    await sleep(25);
+  }
 }
+
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
 function aggregateTotals(perRepo) {
   const t = { filesConsidered: 0, mdFiles: 0, cacheHits: 0, cacheMisses: 0, downloadedBytes: 0, downloadedCount: 0, durationMs: 0, warnCount: 0, errorCount: 0 };

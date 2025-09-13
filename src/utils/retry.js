@@ -1,6 +1,6 @@
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
-export async function withRetry(fn, { tries = 4, baseMs = 400, classify = defaultClassify } = {}) {
+export async function withRetry(fn, { tries = 4, baseMs = 400, classify = defaultClassify, onRetry } = {}) {
   let attempt = 0; let lastErr;
   while (attempt < tries) {
     try {
@@ -10,6 +10,9 @@ export async function withRetry(fn, { tries = 4, baseMs = 400, classify = defaul
       const { retry, waitMs } = classify(err, attempt, { baseMs });
       attempt++;
       if (!retry || attempt >= tries) break;
+      if (typeof onRetry === 'function') {
+        try { onRetry(err, attempt, waitMs); } catch {}
+      }
       await sleep(waitMs);
     }
   }
@@ -26,4 +29,3 @@ function defaultClassify(err, attempt, { baseMs }) {
   if (!isNaN(ra) && ra > 0) waitMs = Math.max(waitMs, ra * 1000);
   return { retry, waitMs };
 }
-
