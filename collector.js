@@ -4,6 +4,9 @@ import { promisify } from 'util';
 import { Octokit } from '@octokit/rest';
 import OpenAI from 'openai';
 import { buildContext } from './src/context/index.js';
+import { loadConfig } from './src/config/index.js';
+import { createGitHubClient } from './src/github/client.js';
+import { collectAll } from './src/github/collect.js';
 
 // Placeholder util to keep API symmetry if needed later
 const noop = promisify((cb) => cb(null));
@@ -24,26 +27,23 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 // --- MAIN LOGIC ---
 async function main() {
   try {
-    // 1. Setup: Create a temporary directory for the files
-    await fs.mkdir(TEMP_DIR, { recursive: true });
+    // Load and validate configuration
+    const cfg = await loadConfig(process.cwd());
 
-    // 2. Read Repo List: Get target repos from repos.txt
-    const reposText = await fs.readFile(REPOS_FILE, 'utf-8');
-    const repoNames = reposText.split('\n').filter(line => line.trim() !== '');
-
-    // 3. Collect Files: Loop through repos and download .md files from their 'inbox'
+    // 1. Collect Files: Loop through repos and download .md files from their 'inbox'
     console.log('Starting file collection...');
-    // ... logic to call GitHub API, get file contents, and save them to TEMP_DIR ...
-    console.log('File collection complete.');
+    const gh = createGitHubClient(cfg.ghPat);
+    const savedFiles = await collectAll(gh, cfg, { concurrency: 6 });
+    console.log(`File collection complete. Downloaded: ${savedFiles.length} file(s).`);
 
     // 4. Prepare Context: Build consolidated markdown context from collected files
     console.log('Generating context from collected files...');
-    const files = await listFilesRecursive(TEMP_DIR);
+    const files = savedFiles.length ? savedFiles : await listFilesRecursive(cfg.tempDir);
     if (files.length === 0) {
       console.warn('No files collected; context will be empty.');
     }
     const context = await buildContext(files, {
-      cwd: TEMP_DIR,
+      cwd: cfg.tempDir,
       projectRoot: process.cwd(),
       linesHead: Number(process.env.LINES_HEAD) || 0,
       linesTail: Number(process.env.LINES_TAIL) || 0,
