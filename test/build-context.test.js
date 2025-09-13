@@ -23,21 +23,15 @@ async function listFilesRecursive(dir) {
   return out.sort();
 }
 
-async function ensureDir(p) {
-  await fs.mkdir(p, { recursive: true });
-}
-
 function normalizeNewlines(s) { return s.replace(/\r?\n/g, '\n'); }
 
 async function main() {
   const projectRoot = path.resolve(path.join(__dirname, '..'));
   const fixturesRoot = path.resolve(path.join(projectRoot, 'test/fixtures'));
   const snapshotsDir = path.resolve(path.join(projectRoot, 'test/snapshots'));
-  const tempWorkDir = path.resolve(path.join(projectRoot, 'test/.tmp-shell-cwd'));
   const snapshotPath = path.join(snapshotsDir, 'build-context.md');
 
-  await ensureDir(snapshotsDir);
-  await ensureDir(tempWorkDir);
+  await fs.mkdir(snapshotsDir, { recursive: true });
 
   const files = await listFilesRecursive(fixturesRoot);
   if (files.length === 0) {
@@ -75,10 +69,7 @@ async function main() {
     console.error('Node builder output does not match snapshot. See test/snapshots/actual-node.md');
   }
 
-  if (!pass) {
-    process.exit(1);
-  }
-
+  if (!pass) process.exit(1);
   console.log('BuildContext snapshot parity: OK');
 }
 

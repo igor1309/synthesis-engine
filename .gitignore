@@ -4,3 +4,4 @@ artifacts/
 repo-content.md
 **/*.log
 logs/
+test/snapshots/actual-*.md
