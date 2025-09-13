@@ -14,11 +14,11 @@
 - Handle API response and error cases
  - Add token accounting; chunk/map-reduce synthesis when context exceeds cap
  - Support streaming and non-streaming modes; configurable model via env/CLI
- - Read master prompt from `master-prompt.md` with validation and fallbacks
+ - Read master prompt from `prompts/master.md` with validation and fallbacks
 
 ## Validation & Error Handling
 - Add environment variable validation at startup
-- Add file existence checks for dependencies (`repos.txt`, `repo2md.sh`)
+- Add file existence checks for dependencies (`config/repos.txt`, `scripts/repo2md.sh`)
 - Improve error messages with specific failure reasons
 - Add logging levels for better debugging
 

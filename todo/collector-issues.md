@@ -6,10 +6,10 @@
 - **Impact**: Script won't function - contains only placeholder code
 
 ## 2. Missing Dependencies
-- **Location**: `collector.js:39`
-- **Issue**: References `repo2md.sh` script that may not exist
-- **Location**: `collector.js:29`
-- **Issue**: Requires `repos.txt` file with no validation
+- **Location**: `collector.js`
+- **Issue**: References `scripts/repo2md.sh` script that may not exist
+- **Location**: `collector.js`
+- **Issue**: Requires `config/repos.txt` file with no validation
 - **Impact**: Runtime failures if files missing
 
 ## 3. Error Handling Gaps

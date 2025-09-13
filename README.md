@@ -9,5 +9,9 @@ synthesis-engine/
 ├── .gitignore
 ├── collector.js                # The core Node.js script
 ├── package.json                # Project dependencies and scripts
-├── repo2md.sh                  # Your existing script, placed here
-└── repos.txt                   # List of repositories to analyze
+├── scripts/
+│   └── repo2md.sh              # Repo → Markdown bundler (shell)
+├── config/
+│   └── repos.txt               # List of repositories to analyze
+└── prompts/
+    └── master.md               # Master prompt used for synthesis

@@ -5,9 +5,9 @@
 *   **The AI Persona:** A hybrid of an **Objective Synthesizer** and a **Critical Thinker**. It first neutrally identifies patterns and connections, then rigorously stress-tests the ideas for conflicts and weaknesses.
 
 *   **The End-to-End Workflow:**
-    1.  A "collector" script reads a `repos.txt` file and uses a GitHub PAT to access your private repositories.
+    1.  A "collector" script reads a `config/repos.txt` file and uses a GitHub PAT to access your private repositories.
     2.  The collector gathers all markdown files from the `inbox` folder of each specified repository.
-    3.  Your existing `repo2md.sh` script is used to format the collected files into a single, large `context.md` file.
+    3.  Your existing `scripts/repo2md.sh` script is used to format the collected files into a single, large `context.md` file.
     4.  A core script reads `context.md`, injects it into a sophisticated master prompt, and sends it to the OpenAI API in a single call.
     5.  The AI's response is saved as a new, verifiable Markdown file: `synthesis_memo.md`.
 

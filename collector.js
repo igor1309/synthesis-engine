@@ -12,8 +12,9 @@ const noop = promisify((cb) => cb(null));
 const GH_PAT = process.env.GH_PAT;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const TEMP_DIR = './temp_inbox_files';
-const REPOS_FILE = 'repos.txt';
+const REPOS_FILE = 'config/repos.txt';
 const OUTPUT_FILE = 'synthesis_memo.md';
+const MASTER_PROMPT_FILE = 'prompts/master.md';
 
 // --- INITIALIZE CLIENTS ---
 const octokit = new Octokit({ auth: GH_PAT });
@@ -42,7 +43,8 @@ async function main() {
       console.warn('No files collected; context will be empty.');
     }
     const context = await buildContext(files, {
-      cwd: process.cwd(),
+      cwd: TEMP_DIR,
+      projectRoot: process.cwd(),
       linesHead: Number(process.env.LINES_HEAD) || 0,
       linesTail: Number(process.env.LINES_TAIL) || 0,
     });
