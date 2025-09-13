@@ -1,15 +1,16 @@
 # Top Priorities (Detailed)
 
-1) Resilience polish
+1) Run-summary UX & visibility
 - Why
-  - Finish resilience by adapting load to rate limits and surfacing retry info.
-- Scope (remaining)
-  - Emit retry counts/timings to step summary and run-summary.
-  - Expose OPENAI/GITHUB retry settings in run-summary.synthesis and metrics.
+  - Make artifacts immediately actionable and portable across runs.
+- Scope
+  - Persist the step summary as `artifacts/<timestamp>/step-summary.md`.
+  - Record selected settings in run-summary (model, log-level, concurrency, retry settings).
+  - Add a tiny CLI (`bin/summary.js`) to pretty-print `run-summary.json` in the terminal.
 - Deliverables
-  - Counters for retries (GitHub list/fetch, OpenAI calls); summary fields for retry stats.
+  - Summary writer update; CLI to render summary.
 - Acceptance
-  - Under simulated 429s, run succeeds and retry counters reflect attempts/delays.
+  - Artifacts include `step-summary.md`; CLI prints a concise overview with totals and retries.
 
 2) Config polish and security
 - Why
@@ -23,13 +24,13 @@
 - Acceptance
   - Runs succeed behind proxies/enterprise; logs never contain secrets; docs cover common failures.
 
-3) Docs & troubleshooting
+3) Per-repo error details
 - Why
-  - Reduce friction for setup and common failures.
+  - Speed up debugging by surfacing concrete failures.
 - Scope
-  - Add docs/Troubleshooting.md (missing inbox, rate limits, invalid token, empty memo, CI failures).
-  - Link from README and AGENTS.md; include env/CLI precedence matrix.
+  - Capture non-404 fetch errors with codes and sample messages; include counts per repo.
+  - Add optional `--fail-on-error` to exit non-zero if any per-repo errors occurred.
 - Deliverables
-  - New troubleshooting doc; README/AGENTS references.
+  - Error aggregation in collector metrics; validator/tests.
 - Acceptance
-  - Clear guidance helps resolve common errors; CI links point to relevant sections.
+  - CI can fail on real errors when enabled; run-summary lists per-repo error counts.
