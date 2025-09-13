@@ -7,6 +7,7 @@ import { buildContext } from './src/context/index.js';
 import { loadConfig } from './src/config/index.js';
 import { createGitHubClient } from './src/github/client.js';
 import { collectAll } from './src/github/collect.js';
+import { logger } from './src/logger/index.js';
 
 // Placeholder util to keep API symmetry if needed later
 const noop = promisify((cb) => cb(null));
@@ -26,21 +27,25 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 // --- MAIN LOGIC ---
 async function main() {
+  const t0 = Date.now();
+  let summary = { status: 'failed' };
   try {
     // Load and validate configuration
     const cfg = await loadConfig(process.cwd());
+    summary.repos = cfg.repos.length;
 
-    // 1. Collect Files: Loop through repos and download .md files from their 'inbox'
-    console.log('Starting file collection...');
+    // 1. Collect Files
+    logger.info('collector: start file collection', { repos: cfg.repos.length });
     const gh = createGitHubClient(cfg.ghPat);
     const savedFiles = await collectAll(gh, cfg, { concurrency: 6 });
-    console.log(`File collection complete. Downloaded: ${savedFiles.length} file(s).`);
+    logger.info('collector: file collection complete', { downloaded: savedFiles.length });
 
-    // 4. Prepare Context: Build consolidated markdown context from collected files
-    console.log('Generating context from collected files...');
+    // 2. Prepare Context
+    logger.info('collector: build context start');
     const files = savedFiles.length ? savedFiles : await listFilesRecursive(cfg.tempDir);
+    summary.contextFiles = files.length;
     if (files.length === 0) {
-      console.warn('No files collected; context will be empty.');
+      logger.warn('collector: no files collected; context will be empty');
     }
     const context = await buildContext(files, {
       cwd: cfg.tempDir,
@@ -48,21 +53,29 @@ async function main() {
       linesHead: Number(process.env.LINES_HEAD) || 0,
       linesTail: Number(process.env.LINES_TAIL) || 0,
     });
-    
-    // 5. Call AI for Synthesis: Send the context to OpenAI with the master prompt
-    console.log('Sending context to AI for synthesis...');
-    // ... logic to call OpenAI API with the master prompt and the 'context' variable ...
+    const contextBytes = Buffer.byteLength(context, 'utf-8');
+    summary.contextBytes = contextBytes;
+    summary.contextTokens = Math.floor((contextBytes + 3) / 4);
+
+    // 3. Synthesis (placeholder)
+    logger.info('collector: send context to AI (placeholder)');
     const memoContent = "AI Generated Content Here"; // Placeholder
 
-    // 6. Save Output: Write the AI's response to the final markdown file
+    // 4. Save Output
     await fs.writeFile(OUTPUT_FILE, memoContent);
-    console.log(`Synthesis memo saved to ${OUTPUT_FILE}`);
+    const st = await fs.stat(OUTPUT_FILE);
+    summary.memoBytes = st.size;
+    logger.info('collector: memo saved', { output: OUTPUT_FILE, bytes: st.size });
 
+    summary.filesDownloaded = savedFiles.length;
+    summary.status = 'success';
   } catch (error) {
-    console.error('An error occurred:', error);
+    logger.error('collector: error', { error: String(error?.message || error) });
     process.exit(1);
   } finally {
-    // 7. Cleanup: Remove the temporary directory
+    summary.durationMs = Date.now() - t0;
+    await logger.writeStepSummary(summary);
+    // Cleanup temp
     await fs.rm(TEMP_DIR, { recursive: true, force: true });
   }
 }

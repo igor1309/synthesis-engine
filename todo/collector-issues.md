@@ -5,12 +5,7 @@
 - **Issue**: AI synthesis remains a placeholder; no API call/logic yet
 - **Impact**: End-to-end memo generation is incomplete
 
-## 2. Output Validation Missing
-- **Location**: `.github/workflows/generate-memo.yml`
-- **Issue**: No verification of non-empty `synthesis_memo.md` prior to commit
-- **Impact**: CI could commit empty/placeholder output if synthesis fails
-
-## 3. Observability
+## 2. Observability (enhance)
 - **Location**: pipeline/logging
-- **Issue**: No structured logs or step summary (counts, sizes, timings)
-- **Impact**: Harder to debug and track performance in CI
+- **Issue**: Structured logs and a step summary now exist, but do not yet include per-repo stats and error codes
+- **Impact**: Harder to pinpoint slow or failing repos at a glance
