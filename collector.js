@@ -37,8 +37,8 @@ async function main() {
     // 1. Collect Files
     logger.info('collector: start file collection', { repos: cfg.repos.length });
     const gh = createGitHubClient(cfg.ghPat);
-    const savedFiles = await collectAll(gh, cfg, { concurrency: 6 });
-    logger.info('collector: file collection complete', { downloaded: savedFiles.length });
+    const { savedFiles, metrics } = await collectAll(gh, cfg, { concurrency: 6 });
+    logger.info('collector: file collection complete', { downloaded: savedFiles.length, cacheHits: metrics.totals.cacheHits, cacheMisses: metrics.totals.cacheMisses, bytes: metrics.totals.downloadedBytes });
 
     // 2. Prepare Context
     logger.info('collector: build context start');
@@ -69,6 +69,22 @@ async function main() {
 
     summary.filesDownloaded = savedFiles.length;
     summary.status = 'success';
+
+    // Persist artifacts snapshot
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    const runDir = path.join('artifacts', ts);
+    await fs.mkdir(runDir, { recursive: true });
+    await fs.writeFile(path.join(runDir, 'context.md'), context);
+    const runSummary = { summary, collect: metrics };
+    await fs.writeFile(path.join(runDir, 'run-summary.json'), JSON.stringify(runSummary, null, 2));
+
+    // Enrich step summary with per-repo stats
+    const lines = [];
+    lines.push('## Per-repo stats');
+    for (const r of metrics.repos) {
+      lines.push(`- ${r.repo}@${r.ref}:${r.inboxPath} — md: ${r.mdFiles}, dl: ${r.downloadedCount}, cache hits: ${r.cacheHits}, bytes: ${r.downloadedBytes}, time: ${(r.durationMs/1000).toFixed(2)}s`);
+    }
+    await logger.writeStepSummary(lines.join('\n') + '\n');
   } catch (error) {
     logger.error('collector: error', { error: String(error?.message || error) });
     process.exit(1);

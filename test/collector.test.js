@@ -73,8 +73,8 @@ async function main() {
   });
 
   // First run: should download two markdown files
-  const saved1 = await collectAll(fake, cfg, { concurrency: 2 });
-  assert.equal(saved1.length, 2, 'first run should save 2 markdown files');
+  const res1 = await collectAll(fake, cfg, { concurrency: 2 });
+  assert.equal(res1.savedFiles.length, 2, 'first run should save 2 markdown files');
   const baseDir = path.join(cfg.tempDir, 'o__r__main');
   const aPath = path.join(baseDir, 'a.md');
   const cPath = path.join(baseDir, 'sub', 'c.md');
@@ -82,13 +82,15 @@ async function main() {
   assert.equal((await fs.readFile(cPath, 'utf-8')).trim(), '# C');
 
   // Second run: no changes -> should skip downloads (cache hit)
-  const saved2 = await collectAll(fake, cfg, { concurrency: 2 });
-  assert.equal(saved2.length, 0, 'second run should skip all via cache');
+  const res2 = await collectAll(fake, cfg, { concurrency: 2 });
+  assert.equal(res2.savedFiles.length, 0, 'second run should skip all via cache');
+  assert.equal(res2.metrics.totals.cacheHits, 2, 'two cache hits expected');
 
   // Change one file's sha/content; expect one new save
   fake._state.files['inbox/a.md'] = { sha: 'sha-a-2', content: '# A updated' };
-  const saved3 = await collectAll(fake, cfg, { concurrency: 2 });
-  assert.equal(saved3.length, 1, 'third run should update 1 file');
+  const res3 = await collectAll(fake, cfg, { concurrency: 2 });
+  assert.equal(res3.savedFiles.length, 1, 'third run should update 1 file');
+  assert.equal(res3.metrics.totals.cacheMisses, 1, 'one cache miss expected');
   assert.equal((await fs.readFile(aPath, 'utf-8')).trim(), '# A updated');
 
   // Cleanup
@@ -97,4 +99,3 @@ async function main() {
 }
 
 main().catch((err) => { console.error(err); process.exit(1); });
-

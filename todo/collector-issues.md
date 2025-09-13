@@ -7,5 +7,5 @@
 
 ## 2. Observability (enhance)
 - **Location**: pipeline/logging
-- **Issue**: Structured logs and a step summary now exist, but do not yet include per-repo stats and error codes
-- **Impact**: Harder to pinpoint slow or failing repos at a glance
+- **Issue**: Per-repo stats and artifacts added; consider adding error codes and warn/error counts
+- **Impact**: Easier to pinpoint slow repos; still can add richer summaries if needed

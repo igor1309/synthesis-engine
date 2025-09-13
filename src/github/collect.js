@@ -11,17 +11,27 @@ export async function collectAll(octokit, config, options = {}) {
   const cache = await readJsonSafe(cacheFile, {});
   const updatedCache = { ...cache };
   const savedFiles = [];
+  const perRepo = [];
 
   for (const spec of repos) {
     const baseDir = repoBaseDir(tempDir, spec);
     await ensureDir(baseDir);
-    const { saved, cacheUpdates } = await collectRepo(octokit, spec, baseDir, cache, options);
+    const t0 = Date.now();
+    const { saved, cacheUpdates, metrics } = await collectRepo(octokit, spec, baseDir, cache, options);
     for (const [k, v] of Object.entries(cacheUpdates)) updatedCache[k] = v;
     savedFiles.push(...saved);
+    perRepo.push({
+      repo: `${spec.owner}/${spec.repo}`,
+      ref: spec.ref || 'HEAD',
+      inboxPath: spec.inboxPath || 'inbox',
+      ...metrics,
+      durationMs: Date.now() - t0,
+    });
   }
 
   await writeJson(cacheFile, updatedCache);
-  return savedFiles;
+  const totals = aggregateTotals(perRepo);
+  return { savedFiles, metrics: { repos: perRepo, totals } };
 }
 
 async function collectRepo(octokit, spec, baseDir, cache, options) {
@@ -33,11 +43,16 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
   const entries = await listTreeRecursive(octokit, spec.owner, spec.repo, inboxPath, ref);
   const files = entries.filter((e) => e.type === 'file' && isMarkdown(e.path));
 
+  let cacheHits = 0;
+  let cacheMisses = 0;
+  let downloadedBytes = 0;
+
   const tasks = files.map((file) => async () => {
     const cacheKey = cacheKeyFor(spec, file.path, ref);
     const prevSha = cache[cacheKey]?.sha;
     if (prevSha && prevSha === file.sha) {
       // Cache hit; skip download.
+      cacheHits++;
       return;
     }
     const content = await getFileContent(octokit, spec.owner, spec.repo, file.path, ref);
@@ -45,11 +60,24 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
     await ensureDir(path.dirname(targetPath));
     await writeFileAtomic(targetPath, content);
     saved.push(targetPath);
+    cacheMisses++;
+    downloadedBytes += Buffer.byteLength(content, 'utf-8');
     cacheUpdates[cacheKey] = { sha: file.sha, size: file.size };
   });
 
   await runLimited(tasks, options.concurrency || 6);
-  return { saved, cacheUpdates };
+  return {
+    saved,
+    cacheUpdates,
+    metrics: {
+      filesConsidered: entries.length,
+      mdFiles: files.length,
+      cacheHits,
+      cacheMisses,
+      downloadedBytes,
+      downloadedCount: saved.length,
+    }
+  };
 }
 
 function repoBaseDir(tempDir, spec) {
@@ -121,3 +149,16 @@ async function runLimited(tasks, limit) {
   await Promise.all(workers);
 }
 
+function aggregateTotals(perRepo) {
+  const t = { filesConsidered: 0, mdFiles: 0, cacheHits: 0, cacheMisses: 0, downloadedBytes: 0, downloadedCount: 0, durationMs: 0 };
+  for (const r of perRepo) {
+    t.filesConsidered += r.filesConsidered || 0;
+    t.mdFiles += r.mdFiles || 0;
+    t.cacheHits += r.cacheHits || 0;
+    t.cacheMisses += r.cacheMisses || 0;
+    t.downloadedBytes += r.downloadedBytes || 0;
+    t.downloadedCount += r.downloadedCount || 0;
+    t.durationMs += r.durationMs || 0;
+  }
+  return t;
+}

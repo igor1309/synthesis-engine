@@ -67,3 +67,10 @@ jobs:
         if: failure()
         run: |
           echo "❌ Synthesis memo generation failed. Check previous steps for details." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthesis-artifacts
+          path: artifacts/
