@@ -77,3 +77,16 @@ jobs:
       GH_PAT: ${{ secrets.GH_PAT }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
+
+**Run Summary Schema**
+- Location: `artifacts/<timestamp>/run-summary.json`
+- Top-level fields:
+  - `schemaVersion` (string), `generatedAt` (ISO string)
+  - `summary` (object):
+    - `status`, `repos`, `filesDownloaded` (optional),
+    - `contextFiles`, `contextBytes`, `contextTokens`, `memoBytes`, `durationMs`, `errorCode` (optional),
+    - `synthesis` (object, optional)
+  - `metrics` (object):
+    - `totals`: `{ mdFiles, downloadedCount, downloadedBytes, cacheHits, cacheMisses, durationMs }`
+    - `perRepo[]`: `{ repo, ref, inboxPath, mdFiles, downloadedCount, cacheHits, cacheMisses, downloadedBytes, durationMs }`
+  - `synthesis` (object|null): `{ model, temperature, contextTokens, maxContextTokens, chunked, chunks }`
