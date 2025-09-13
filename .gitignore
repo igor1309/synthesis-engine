@@ -4,9 +4,11 @@ artifacts/
 node_modules/
 .cache/
 repo-content.md
+synthesis_memo.md
 **/*.log
 logs/
 test/snapshots/actual-*.md
+test/.tmp-summary-*.md
 **/.repo2md.tmp.*
 .env
 .env.local

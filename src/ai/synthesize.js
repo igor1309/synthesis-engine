@@ -1,6 +1,9 @@
 import fs from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
 import { estimateTokensFromText, splitContextByHeadings } from './token.js';
 import { withRetry } from '../utils/retry.js';
+import { readJsonSafe, writeJson } from '../io/fs.js';
 
 export async function loadMasterPrompt(projectRoot) {
   const fp = `${projectRoot}/prompts/master.md`;
@@ -29,22 +32,57 @@ export async function synthesizeMemo(openai, context, options = {}) {
   const maxContextTokens = options.contextMaxTokens || Number(process.env.CONTEXT_MAX_TOKENS || 120000);
 
   const oaiStats = { retries: 0, waitMs: 0 };
+  const cacheStats = { oneshotHits: 0, oneshotMisses: 0, mapHits: 0, mapMisses: 0, reduceHits: 0, reduceMisses: 0 };
+  const cacheDir = path.resolve(projectRoot, 'artifacts/cache');
+  const ttlMs = getCacheTtlMs();
   if (contextTokens <= maxContextTokens) {
     const messages = buildMessages(prompt, context);
+    const promptHash = sha256(prompt);
+    const ctxHash = sha256(context);
+    const key = `oneshot_${model}_${temperature}_${promptHash}_${ctxHash}`;
+    const cached = await readCache(cacheDir, key, ttlMs);
+    if (cached) {
+      cacheStats.oneshotHits++;
+      return { content: validateMemo(cached.content), meta: synthMeta({ model, temperature, contextTokens, maxContextTokens, chunked: false, chunks: 1, oaiStats, cacheStats }) };
+    }
+    cacheStats.oneshotMisses++;
     const out = await callChat(openai, { model, temperature, messages }, oaiStats);
-    return { content: validateMemo(out), meta: { model, temperature, contextTokens, maxContextTokens, chunked: false, chunks: 1, openaiRetries: oaiStats.retries, openaiWaitMs: oaiStats.waitMs } };
+    const content = validateMemo(out);
+    await writeCache(cacheDir, key, { content, createdAt: new Date().toISOString(), model, temperature, promptHash, inputHash: ctxHash });
+    return { content, meta: synthMeta({ model, temperature, contextTokens, maxContextTokens, chunked: false, chunks: 1, oaiStats, cacheStats }) };
   }
 
   // Map-Reduce flow
   const approxChunk = Math.max(2000, Math.floor(maxContextTokens * 0.8));
   const chunks = splitContextByHeadings(context, approxChunk);
   const partials = [];
+  const promptHash = sha256(prompt);
   for (const chunk of chunks) {
     const messages = buildMessages(prompt, chunk);
-    const out = await callChat(openai, { model, temperature, messages }, oaiStats);
-    partials.push(validatePartial(out));
+    const chunkHash = sha256(chunk);
+    const key = `map_${model}_${temperature}_${promptHash}_${chunkHash}`;
+    const cached = await readCache(cacheDir, key, ttlMs);
+    if (cached) {
+      cacheStats.mapHits++;
+      partials.push(validatePartial(cached.content));
+    } else {
+      cacheStats.mapMisses++;
+      const out = await callChat(openai, { model, temperature, messages }, oaiStats);
+      const content = validatePartial(out);
+      await writeCache(cacheDir, key, { content, createdAt: new Date().toISOString(), model, temperature, promptHash, inputHash: chunkHash });
+      partials.push(content);
+    }
   }
-  return { content: mergePartials(partials), meta: { model, temperature, contextTokens, maxContextTokens, chunked: true, chunks: chunks.length, openaiRetries: oaiStats.retries, openaiWaitMs: oaiStats.waitMs } };
+  const reduceKey = `reduce_${model}_${temperature}_${promptHash}_${sha256(JSON.stringify(partials))}`;
+  const cachedReduce = await readCache(cacheDir, reduceKey, ttlMs);
+  if (cachedReduce) {
+    cacheStats.reduceHits++;
+    return { content: validateMemo(cachedReduce.content), meta: synthMeta({ model, temperature, contextTokens, maxContextTokens, chunked: true, chunks: chunks.length, oaiStats, cacheStats }) };
+  }
+  cacheStats.reduceMisses++;
+  const merged = mergePartials(partials);
+  await writeCache(cacheDir, reduceKey, { content: merged, createdAt: new Date().toISOString(), model, temperature, promptHash, inputHash: sha256(JSON.stringify(partials)) });
+  return { content: merged, meta: synthMeta({ model, temperature, contextTokens, maxContextTokens, chunked: true, chunks: chunks.length, oaiStats, cacheStats }) };
 }
 
 function buildMessages(masterPrompt, context) {
@@ -155,4 +193,60 @@ function joinBlocks(blocks) {
 
 function escapeReg(s) {
   return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// --- Caching helpers ---
+function sha256(s) {
+  return crypto.createHash('sha256').update(String(s)).digest('hex');
+}
+
+function getCacheTtlMs() {
+  const v = process.env.SYNTH_CACHE_TTL_MS;
+  const n = v != null ? Number(v) : NaN;
+  if (!Number.isNaN(n)) return Math.max(0, n);
+  // default: 7 days
+  return 7 * 24 * 60 * 60 * 1000;
+}
+
+async function readCache(cacheDir, key, ttlMs) {
+  try {
+    const file = cachePath(cacheDir, key);
+    const data = await readJsonSafe(file, null);
+    if (!data) return null;
+    const createdAt = Date.parse(data.createdAt || 0);
+    if (!Number.isFinite(createdAt)) return null;
+    if (ttlMs === 0) return null;
+    if (Date.now() - createdAt > ttlMs) return null;
+    if (!data.content) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+async function writeCache(cacheDir, key, value) {
+  const file = cachePath(cacheDir, key);
+  await writeJson(file, value);
+}
+
+function cachePath(cacheDir, key) {
+  const [bucket] = key.split('_', 1);
+  const rel = key + '.json';
+  return path.resolve(cacheDir, bucket, rel);
+}
+
+function synthMeta({ model, temperature, contextTokens, maxContextTokens, chunked, chunks, oaiStats, cacheStats }) {
+  return {
+    model, temperature, contextTokens, maxContextTokens, chunked, chunks,
+    openaiRetries: oaiStats.retries, openaiWaitMs: oaiStats.waitMs,
+    cache: {
+      oneshotHits: cacheStats.oneshotHits,
+      oneshotMisses: cacheStats.oneshotMisses,
+      mapHits: cacheStats.mapHits,
+      mapMisses: cacheStats.mapMisses,
+      reduceHits: cacheStats.reduceHits,
+      reduceMisses: cacheStats.reduceMisses,
+      ttlMs: getCacheTtlMs()
+    }
+  };
 }

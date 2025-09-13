@@ -1,9 +1,9 @@
-# Run Summary Schema (v1.0)
+# Run Summary Schema (v1.1)
 
 Location: `artifacts/<timestamp>/run-summary.json`
 
 Top-level fields
-- `schemaVersion` (string): Semantic schema version, e.g., `"1.0"`.
+- `schemaVersion` (string): Semantic schema version, e.g., `"1.1"`.
 - `generatedAt` (string): ISO-8601 timestamp when the summary was written.
 - `summary` (object): High-level run information.
 - `metrics` (object): Aggregated and per-repo metrics.
@@ -26,6 +26,11 @@ Top-level fields
   - `maxContextTokens` (number)
   - `chunked` (boolean)
   - `chunks` (number)
+  - `cache` (object, optional):
+    - `oneshotHits` (number), `oneshotMisses` (number)
+    - `mapHits` (number), `mapMisses` (number)
+    - `reduceHits` (number), `reduceMisses` (number)
+    - `ttlMs` (number)
 
 `metrics`
 - `totals` (object):
@@ -43,6 +48,12 @@ Top-level fields
   - `inboxPath` (string)
   - `mdFiles`, `downloadedCount`, `cacheHits`, `cacheMisses`, `downloadedBytes`, `warnCount`, `errorCount`, `durationMs` (numbers; optional)
 
-Versioning
-- Increment `schemaVersion` when field names or semantics change. Additive fields can ship under the same minor version.
+`settings`
+- `logLevel` (string)
+- `concurrency` (number)
+- `github` (object): `retries`, `timeoutMs`, `baseUrl`
+- `openai` (object): `model`, `temperature`, `baseUrl`, `retries`, `baseDelayMs`
+- `synthesisCache` (object): `ttlMs`
 
+Versioning
+- Increment `schemaVersion` when field names or semantics change. Additive fields can ship under the same minor version. This version adds `synthesis.cache` and `settings.synthesisCache`.

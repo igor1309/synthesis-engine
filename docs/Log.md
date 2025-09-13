@@ -16,6 +16,8 @@
  - CI/workflows: dogfooded reusable agent workflow from generate-memo; added fail-on-error input; preserved commit step.
  - Config/docs: added precedence matrix and examples; integration redaction test covering step summary and run summary.
 
+- Synthesis cache: added cross-run cache for one-shot, map, and reduce phases under `artifacts/cache/` with TTL; added cache metrics to synthesis meta and step summary; schema bumped to v1.1; tests for hits/misses and TTL.
+
 ## 2025-09-12
 
 - Gemini 2.5 Pro came up with a `Synthesis Engine` and other.

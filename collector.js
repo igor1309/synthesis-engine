@@ -127,7 +127,7 @@ async function main() {
     await fs.mkdir(runDir, { recursive: true });
     await fs.writeFile(path.join(runDir, 'context.md'), context);
     const runSummary = {
-      schemaVersion: '1.0',
+      schemaVersion: '1.1',
       generatedAt: new Date().toISOString(),
       summary,
       metrics: { totals: metrics.totals || {}, perRepo: metrics.repos || [] },
@@ -170,7 +170,14 @@ async function main() {
         lines.push(`- retries (OpenAI): calls ${summary.synthesis.openaiRetries} · wait ~${(summary.synthesis.openaiWaitMs/1000).toFixed(1)}s`);
       }
       if (summary.contextBytes !== undefined) lines.push(`- context: files ${summary.contextFiles || 0} · size ${human(summary.contextBytes)} · est tokens ~${summary.contextTokens || 0}`);
-      if (summary.synthesis) lines.push(`- synthesis: model ${summary.synthesis.model} · chunked ${summary.synthesis.chunked ? 'yes' : 'no'} · chunks ${summary.synthesis.chunks}`);
+      if (summary.synthesis) {
+        lines.push(`- synthesis: model ${summary.synthesis.model} · chunked ${summary.synthesis.chunked ? 'yes' : 'no'} · chunks ${summary.synthesis.chunks}`);
+        const c = summary.synthesis.cache || {};
+        if (c) {
+          const sm = `oneshot ${c.oneshotHits||0}/${c.oneshotMisses||0} · map ${c.mapHits||0}/${c.mapMisses||0} · reduce ${c.reduceHits||0}/${c.reduceMisses||0}`;
+          lines.push(`- synthesis cache: ${sm} · ttl ${(Math.round((c.ttlMs||0)/3600000))}h`);
+        }
+      }
       if (summary.durationMs !== undefined) lines.push(`- duration: ${(summary.durationMs/1000).toFixed(1)}s`);
     }
     // Errors section (sample)
@@ -301,6 +308,9 @@ function buildSettingsObject() {
       baseUrl: process.env.OPENAI_BASE_URL || undefined,
       retries: Number(process.env.OPENAI_RETRIES || 4),
       baseDelayMs: Number(process.env.OPENAI_BASE_DELAY_MS || 400),
+    },
+    synthesisCache: {
+      ttlMs: Number(process.env.SYNTH_CACHE_TTL_MS || (7 * 24 * 60 * 60 * 1000))
     }
   };
 }

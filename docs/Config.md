@@ -36,6 +36,7 @@ Environment variables
   - `OPENAI_BASE_DELAY_MS` — base backoff delay (ms), default `400`
   - `OPENAI_BASE_URL` — compatible base URL (optional)
   - `MEMO_MIN_CITATIONS` — minimum required `Source:` citations when context is non-empty (default `1`)
+  - `SYNTH_CACHE_TTL_MS` — synthesis cache TTL in milliseconds (default 7 days; `0` disables cache reads)
 - Logging/behavior
   - `LOG_LEVEL` — `info|debug|warn|error`
   - `DRY_RUN` — `1|true` to skip network calls
