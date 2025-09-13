@@ -13,18 +13,16 @@
 - Acceptance
   - CI shows enriched summary with counters and tips; artifacts include updated schema with counters.
 
-2) Resilience: rate limiting and retries
+2) Resilience polish
 - Why
-  - Improves reliability under GitHub 403/429 and OpenAI transient errors; avoids flakiness.
-- Scope
-  - Implement exponential backoff with jitter and respect `Retry-After` for GitHub; cap concurrency on 403/429.
-  - Add retry policy for OpenAI calls (timeouts, 429, 5xx) with max attempts; surface concise error summaries.
-  - Add tests with fake clients simulating rate limits/timeouts.
+  - Finish resilience by adapting load to rate limits and surfacing retry info.
+- Scope (remaining)
+  - Adaptive concurrency: temporarily reduce GitHub fetch concurrency on repeated 403/429.
+  - Emit retry counts/timings to summary; expose OPENAI/GITHUB retry settings in run-summary.
 - Deliverables
-  - Retry/backoff utilities and integration in GitHub client and synthesis module.
-  - Configurable limits via env/CLI; minimal logs showing retries.
+  - Concurrency governor for collector; summary fields for retry stats.
 - Acceptance
-  - Simulated 429/5xx recover after retries; severe cases fail fast with clear messages and codes.
+  - Under simulated 429s, concurrency decreases and run succeeds within retry budget.
 
 3) Config polish and security
 - Why
