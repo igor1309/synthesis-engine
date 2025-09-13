@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -20,16 +22,32 @@ jobs:
         with:
           node-version: "20" # Use a current LTS version
 
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install dependencies
         run: npm install
 
+      - name: Run tests (if present)
+        run: npm test --if-present
+
       - name: Run collector and synthesis script
-        run: node collector.js
+        shell: bash
+        continue-on-error: false
+        run: |
+          set -euo pipefail
+          node collector.js
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Commit and push the new memo
+        if: github.ref == 'refs/heads/trunk'
         run: |
           git config --global user.name 'Synthesis Engine Bot'
           git config --global user.email 'bot@users.noreply.github.com'
@@ -37,3 +55,8 @@ jobs:
           # Only commit if there are changes to the file
           git diff --staged --quiet || git commit -m "docs: generate new synthesis memo for $(date -u +'%Y-%m-%d')"
           git push
+
+      - name: Add failure summary
+        if: failure()
+        run: |
+          echo "❌ Synthesis memo generation failed. Check previous steps for details." >> "$GITHUB_STEP_SUMMARY"
