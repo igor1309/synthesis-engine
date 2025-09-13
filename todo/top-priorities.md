@@ -23,13 +23,5 @@
 - Acceptance
   - CI can fail on real errors when enabled; run-summary lists per-repo error counts.
 
-3) Summary UX polish
-- Why
-  - Make artifacts immediately actionable and portable across runs.
-- Scope (remaining)
-  - Add optional table formatting for per-repo stats in step summary.
-  - Include links to artifacts in the step summary when running in CI.
-- Deliverables
-  - Summary template updates.
-- Acceptance
-  - Step summary is more scannable; artifact links present in CI.
+3) (free)
+  - Reserved for next discovered need after per-repo errors.
