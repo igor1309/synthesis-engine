@@ -2,7 +2,6 @@
 - Feature-flag to set default strategy
 - Refactor `scripts/repo2md.sh` to output to stdout
 - Control truncation via env vars LINES_HEAD and LINES_TAIL
-- Add workflow to run tests on push to trunk
 
 - Add size/token cap guard with map-reduce synthesis when exceeded
 - Persist artifacts for debugging under `artifacts/<timestamp>/` (inputs, context, logs)
