@@ -43,3 +43,27 @@ synthesis-engine/
 **Notes**
 - Optional context tuning: `LINES_HEAD`, `LINES_TAIL` to truncate large files.
 - Set `DRY_RUN=1` to bypass both GitHub and OpenAI regardless of secrets.
+
+**Reusable Workflow**
+- This repo provides a reusable workflow to run synthesis from other repos.
+- Example caller workflow:
+
+```yaml
+name: Weekly Synthesis
+on:
+  schedule:
+    - cron: '0 5 * * 0'
+  workflow_dispatch:
+
+jobs:
+  synthesize:
+    uses: <owner>/<repo>/.github/workflows/agent-synthesis.yml@trunk
+    with:
+      node-version: '20'
+      memo-path: 'synthesis_memo.md'
+      dry-run: false
+      log-level: info
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+```

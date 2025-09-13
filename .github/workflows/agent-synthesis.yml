@@ -1,0 +1,123 @@
+name: Agent Synthesis (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version
+        required: false
+        type: string
+        default: '20'
+      memo-path:
+        description: Path to write synthesis memo
+        required: false
+        type: string
+        default: 'synthesis_memo.md'
+      dry-run:
+        description: Skip network calls and produce placeholder memo
+        required: false
+        type: boolean
+        default: false
+      log-level:
+        description: LOG_LEVEL for structured logs
+        required: false
+        type: string
+        default: 'info'
+    secrets:
+      GH_PAT:
+        description: GitHub Personal Access Token
+        required: false
+      OPENAI_API_KEY:
+        description: OpenAI API key (optional for dry-run or collector-only)
+        required: false
+    outputs:
+      memo-bytes:
+        description: Memo size in bytes
+        value: ${{ jobs.build.outputs.memo-bytes }}
+      context-bytes:
+        description: Context size in bytes
+        value: ${{ jobs.build.outputs.context-bytes }}
+      files-downloaded:
+        description: Files downloaded in this run
+        value: ${{ jobs.build.outputs.files-downloaded }}
+      duration-ms:
+        description: Reported duration in ms
+        value: ${{ jobs.build.outputs.duration-ms }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      memo-bytes: ${{ steps.set-outputs.outputs.memo_bytes }}
+      context-bytes: ${{ steps.set-outputs.outputs.context_bytes }}
+      files-downloaded: ${{ steps.set-outputs.outputs.files_downloaded }}
+      duration-ms: ${{ steps.set-outputs.outputs.duration_ms }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs['node-version'] }}
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run collector and synthesis
+        id: run
+        shell: bash
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LOG_LEVEL: ${{ inputs['log-level'] }}
+          DRY_RUN: ${{ inputs['dry-run'] }}
+        run: |
+          set -euo pipefail
+          node collector.js
+
+      - name: Validate memo output
+        shell: bash
+        env:
+          MEMO_PATH: ${{ inputs['memo-path'] }}
+        run: |
+          set -euo pipefail
+          if [ ! -s "$MEMO_PATH" ]; then
+            echo "❌ Memo missing or empty at $MEMO_PATH" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "✅ Memo present: $(wc -c < "$MEMO_PATH") bytes" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set outputs
+        id: set-outputs
+        shell: bash
+        env:
+          MEMO_PATH: ${{ inputs['memo-path'] }}
+        run: |
+          set -euo pipefail
+          memo_bytes=$(wc -c < "$MEMO_PATH" | tr -d ' ')
+          context_bytes=$(jq -r '.summary.contextBytes // 0' artifacts/*/run-summary.json 2>/dev/null || echo 0)
+          files_downloaded=$(jq -r '.summary.filesDownloaded // 0' artifacts/*/run-summary.json 2>/dev/null || echo 0)
+          duration_ms=$(jq -r '.summary.durationMs // 0' artifacts/*/run-summary.json 2>/dev/null || echo 0)
+          echo "memo_bytes=$memo_bytes" >> "$GITHUB_OUTPUT"
+          echo "context_bytes=$context_bytes" >> "$GITHUB_OUTPUT"
+          echo "files_downloaded=$files_downloaded" >> "$GITHUB_OUTPUT"
+          echo "duration_ms=$duration_ms" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthesis-artifacts
+          path: |
+            artifacts/
+            ${{ inputs['memo-path'] }}
+
