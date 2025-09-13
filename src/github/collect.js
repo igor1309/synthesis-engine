@@ -50,17 +50,31 @@ async function collectRepo(octokit, spec, baseDir, cache, options) {
   const tasks = files.map((file) => async () => {
     const cacheKey = cacheKeyFor(spec, file.path, ref);
     const prevSha = cache[cacheKey]?.sha;
-    if (prevSha && prevSha === file.sha) {
-      // Cache hit; skip download.
-      cacheHits++;
-      return;
-    }
-    const content = await getFileContent(octokit, spec.owner, spec.repo, file.path, ref);
     const targetPath = path.join(baseDir, file.path.slice(inboxPath.length + (inboxPath ? 1 : 0)));
+
+    // If we have a cache hit but the local file does not exist (e.g., cleaned temp dir), download it.
+    if (prevSha && prevSha === file.sha) {
+      try {
+        const st = await fs.stat(targetPath);
+        if (st.isFile()) {
+          cacheHits++;
+          return;
+        }
+      } catch {
+        // fall through to download
+      }
+    }
+
+    const content = await getFileContent(octokit, spec.owner, spec.repo, file.path, ref);
     await ensureDir(path.dirname(targetPath));
     await writeFileAtomic(targetPath, content);
     saved.push(targetPath);
-    cacheMisses++;
+    if (prevSha && prevSha === file.sha) {
+      // Cache said unchanged but local missing -> treat as hit for metrics? We count as miss to reflect download.
+      cacheMisses++;
+    } else {
+      cacheMisses++;
+    }
     downloadedBytes += Buffer.byteLength(content, 'utf-8');
     cacheUpdates[cacheKey] = { sha: file.sha, size: file.size };
   });
