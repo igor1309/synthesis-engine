@@ -13,6 +13,7 @@
 - Caching fix: re-download files on cache hit when local copy missing; ensures context builds after temp cleanup.
 - Reusable workflow: added `.github/workflows/agent-synthesis.yml` with inputs/secrets/outputs; README usage snippet.
 - Safety rules: AGENTS.md updated to never touch .env/.env.local and prefer explicit staging; dotenv test now uses a temp dir.
+- Memo validation: added structural validator and CLI; integrated into CI (generate-memo.yml, agent-synthesis.yml); tests added.
 
 ## 2025-09-12
 

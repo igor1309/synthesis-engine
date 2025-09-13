@@ -23,18 +23,18 @@
   - CI shows enriched step summary with metrics and error counts; artifacts attached on failure.
   - Misconfiguration fails fast with clear messages; secrets are never written to logs.
 
-2) Memo linting and output validation
+2) Observability enrichment
 - Why
-  - Ensures the memo is structurally correct and useful, preventing low-quality or malformed outputs from passing CI.
+  - Make runs easy to debug and review by surfacing richer, consistent metrics and summaries.
 - Scope
-  - Validate required sections and headers, enforce at least one item under Themes/Connections/Conflicts when context is non-empty.
-  - Check for "Source:" citation lines and basic Markdown well-formedness (no unclosed fences, missing separators).
-  - Add a small CLI `memo-validate` used in CI and locally; exit non-zero on failure with actionable messages.
+  - Expand step summary: per-repo details, totals, cache hit/miss ratios, durations, error/warn counters.
+  - Formalize `artifacts/*/run-summary.json` schema (versioned) and include synthesis metadata (model, token estimates).
+  - Add standardized error codes and brief remediation tips in logs.
 - Deliverables
-  - `src/ai/validateMemo.js` with reusable checks; integrate in collector or separate npm script.
-  - CI step to run validation; step summary lines on failures.
+  - Logger helpers to aggregate and emit metrics; schema doc for run-summary; summary templates.
+  - Tests for summary writer and schema shape.
 - Acceptance
-  - Bad or placeholder memos fail validation; good memos pass. Clear error messages.
+  - CI shows enriched summary; artifacts include a valid, versioned summary; errors include codes.
 
 3) Resilience: rate limiting and retries
 - Why
