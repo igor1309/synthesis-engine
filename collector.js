@@ -142,9 +142,16 @@ async function main() {
 
     // Enrich step summary with per-repo stats
     const lines = [];
-    lines.push('## Per-repo stats');
-    for (const r of metrics.repos || []) {
-      lines.push(`- ${r.repo}@${r.ref}:${r.inboxPath} — md: ${r.mdFiles}, dl: ${r.downloadedCount}, cache hits: ${r.cacheHits}, bytes: ${r.downloadedBytes}, time: ${(r.durationMs/1000).toFixed(2)}s`);
+    const per = metrics.repos || [];
+    if (per.length) {
+      lines.push('## Repos');
+      lines.push('| Repo | md | dl | hits | misses | bytes | time | warn | err |');
+      lines.push('|:-----|---:|---:|----:|------:|------:|-----:|-----:|----:|');
+      for (const r of per) {
+        const repoKey = `${r.repo}@${r.ref}:${r.inboxPath}`;
+        const sec = (r.durationMs/1000).toFixed(2) + 's';
+        lines.push(`| ${repoKey} | ${r.mdFiles||0} | ${r.downloadedCount||0} | ${r.cacheHits||0} | ${r.cacheMisses||0} | ${human(r.downloadedBytes||0)} | ${sec} | ${r.warnCount||0} | ${r.errorCount||0} |`);
+      }
     }
     const t = metrics.totals || {};
     if (t.mdFiles !== undefined) {
@@ -173,6 +180,16 @@ async function main() {
       lines.push('## Tips');
       for (const tip of tips) lines.push(`- ${tip}`);
     }
+    // Artifacts section
+    const repoSlug = process.env.GITHUB_REPOSITORY;
+    const runId = process.env.GITHUB_RUN_ID;
+    const ghRunsUrl = (repoSlug && runId) ? `https://github.com/${repoSlug}/actions/runs/${runId}` : null;
+    lines.push('');
+    lines.push('## Artifacts');
+    lines.push(`- Directory: ${runDir}`);
+    lines.push('- Files: context.md, run-summary.json, step-summary.md');
+    if (ghRunsUrl) lines.push(`- Actions run: ${ghRunsUrl}`);
+
     const stepMd = lines.join('\n') + '\n';
     await logger.writeStepSummary(stepMd);
     try { await fs.writeFile(path.join(runDir, 'step-summary.md'), stepMd); } catch {}
