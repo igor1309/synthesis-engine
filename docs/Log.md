@@ -2,27 +2,16 @@
 
 ## 2025-09-13
 
-- Repo reorg: moved `scripts/`, `config/`, `prompts/`; updated references and kept bundler stdout-only with temp cleanup.
-- BuildContext parity: added fixtures + snapshot test; aligned Node builder with shell output (truncation, fences).
-- CI split: fast lint-and-test on push/PR; memo generation only schedule/manual; conditional lint; memo output validation; upload artifacts on failure.
-- GitHub collector: added config loader, repo spec parsing (`owner/repo@ref:path`), recursive inbox listing, Markdown filter, SHA cache, concurrency; writes to `temp_inbox_files/`.
-- Observability: structured JSON logging, step summary with context stats; per-repo metrics and artifacts snapshot (`artifacts/<timestamp>/`).
-- Tests: added config-parse and collector cache tests; all tests pass.
-- OpenAI synthesis: implemented token estimation, chunking/map-reduce, prompt loading with fallback; wired into collector; added synth tests.
-- Dotenv + dry-run: load .env/.env.local; support DRY_RUN to skip network; lazy import OpenAI/Octokit.
-- Caching fix: re-download files on cache hit when local copy missing; ensures context builds after temp cleanup.
-- Reusable workflow: added `.github/workflows/agent-synthesis.yml` with inputs/secrets/outputs; README usage snippet.
-- Safety rules: AGENTS.md updated to never touch .env/.env.local and prefer explicit staging; dotenv test now uses a temp dir.
-- Memo validation: added structural validator and CLI; integrated into CI (generate-memo.yml, agent-synthesis.yml); tests added.
-- Hardening: CLI overrides for env, error codes in logs/summary, GitHub request timeouts, retry/backoff utility (used for GitHub listing/content), .env.example, README flags.
-- Observability enrichment: versioned run-summary with synthesis metadata; enriched step summary totals/ratios; documented schema in README.
-- Observability enrichment: added warn/error counters, remediation tips; versioned schema docs.
-- Resilience: OpenAI retries/backoff + GitHub retries; adaptive concurrency on 403/429; tracked retry counters/wait and surfaced in summaries; tests added.
-- Config/security: GHE base URL and OpenAI base URL support; proxy envs; secret redaction in logs/summary; Troubleshooting doc; README links.
-- Run-summary UX: persisted step-summary.md under artifacts; added settings to run-summary; added `npm run summary` CLI for quick terminal overview.
-- Summary UX polish: table-formatted per-repo stats; artifact links in step summary (with Actions URL when available).
- - Summary UX: added compact Errors section with per-repo samples in step summary.
- - Per-repo errors: capture non-404 list/fetch errors with samples; added `--fail-on-error` to exit non-zero when errors present; tests and docs updated.
+- Repo reorg and builder parity: moved directories; snapshot parity between shell and Node builders.
+- CI split: fast lint/test on push/PR; scheduled/manual memo generation; memo validation and artifacts on failure.
+- GitHub collector: config loader, repo spec parsing (`owner/repo@ref:path`), recursive listing, Markdown filter, SHA cache with re-download, concurrency.
+- Observability: structured logs; per-repo metrics; step summary and artifacts snapshot (`artifacts/<timestamp>/`).
+- OpenAI synthesis: token estimation, chunking/map-reduce, prompt loading with fallback; integrated and tested.
+- Dotenv + dry-run: load `.env`/`.env.local`; DRY_RUN path; lazy imports.
+- Resilience: retries/backoff for GitHub/OpenAI; adaptive concurrency on 403/429; retry counters and wait times tracked; tests.
+- Config/security: GHE and OpenAI base URLs; proxy envs; secret redaction; docs/Config.md; Troubleshooting guide; README links.
+- Summary UX: versioned schema; settings recorded; `npm run summary` CLI; per-repo table; artifact links; compact Errors section.
+- Per-repo errors: capture non-404 list/fetch errors with samples; `--fail-on-error` option; tests and docs.
 
 ## 2025-09-12
 
