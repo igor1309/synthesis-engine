@@ -43,6 +43,7 @@ synthesis-engine/
 **Notes**
 - Optional context tuning: `LINES_HEAD`, `LINES_TAIL` to truncate large files.
 - Set `DRY_RUN=1` to bypass both GitHub and OpenAI regardless of secrets.
+ - See docs/Config.md for env vars, CLI flags, and precedence.
 
 CLI flags (override env)
 - `--log-level info|debug|warn|error`
@@ -51,6 +52,9 @@ CLI flags (override env)
 - `--openai-temperature 0.2`
 - `--context-max-tokens 120000`
 - `--lines-head 0 --lines-tail 0`
+ - `--github-base-url https://ghe.example`
+ - `--openai-base-url https://oai.example`
+ - `--github-concurrency 6`
 
 Example: `node collector.js --dry-run --log-level debug --context-max-tokens 80000`
 
