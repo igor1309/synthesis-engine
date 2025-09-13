@@ -1,38 +1,32 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { promisify } from 'util';
-import { Octokit } from '@octokit/rest';
 import OpenAI from 'openai';
 import { buildContext } from './src/context/index.js';
 import { loadConfig } from './src/config/index.js';
 import { createGitHubClient } from './src/github/client.js';
 import { collectAll } from './src/github/collect.js';
 import { logger } from './src/logger/index.js';
+import { loadDotEnv } from './src/config/dotenv.js';
 import { synthesizeMemo } from './src/ai/synthesize.js';
 
 // Placeholder util to keep API symmetry if needed later
 const noop = promisify((cb) => cb(null));
 
 // --- CONFIGURATION ---
-const GH_PAT = process.env.GH_PAT;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const TEMP_DIR = './temp_inbox_files';
-const REPOS_FILE = 'config/repos.txt';
 const OUTPUT_FILE = 'synthesis_memo.md';
-const MASTER_PROMPT_FILE = 'prompts/master.md';
-
-// --- INITIALIZE CLIENTS ---
-const octokit = new Octokit({ auth: GH_PAT });
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 
 // --- MAIN LOGIC ---
 async function main() {
   const t0 = Date.now();
   let summary = { status: 'failed' };
+  let cfg;
   try {
+    // Load .env first so loaders can see env vars
+    await loadDotEnv(process.cwd());
     // Load and validate configuration
-    const cfg = await loadConfig(process.cwd());
+    cfg = await loadConfig(process.cwd());
     summary.repos = cfg.repos.length;
 
     // 1. Collect Files
@@ -60,6 +54,7 @@ async function main() {
 
     // 3. Synthesis
     logger.info('collector: synthesis start', { model: process.env.OPENAI_MODEL || 'gpt-4o-mini' });
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const memoContent = await synthesizeMemo(openai, context, {
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       temperature: Number(process.env.OPENAI_TEMPERATURE || 0.2),
@@ -98,7 +93,7 @@ async function main() {
     summary.durationMs = Date.now() - t0;
     await logger.writeStepSummary(summary);
     // Cleanup temp
-    await fs.rm(TEMP_DIR, { recursive: true, force: true });
+    if (cfg?.tempDir) await fs.rm(cfg.tempDir, { recursive: true, force: true });
   }
 }
 

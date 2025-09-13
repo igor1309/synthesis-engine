@@ -6,3 +6,5 @@ repo-content.md
 logs/
 test/snapshots/actual-*.md
 **/.repo2md.tmp.*
+.env
+.env.local
