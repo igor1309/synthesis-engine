@@ -24,7 +24,9 @@ async function run() {
   {
     const client = new FakeOpenAI('chat');
     const context = '# REPO CONTENT\n\n## Files\n\n### a.md\ncontent\n';
-    const memo = await synthesizeMemo(client, context, { contextMaxTokens: 999999, model: 'test' });
+    const out = await synthesizeMemo(client, context, { contextMaxTokens: 999999, model: 'test' });
+    assert(out && out.content, 'expected result with content');
+    const memo = out.content;
     assert(memo.includes('# Synthesis Memo'));
     assert(memo.includes('PART 1'));
     assert(memo.includes('PART 2'));
@@ -34,14 +36,15 @@ async function run() {
   {
     const client = new FakeOpenAI('chat');
     const context = ['# REPO CONTENT', '## Files', '### a.md', 'A', '### b.md', 'B', '### c.md', 'C'].join('\n');
-    const memo = await synthesizeMemo(client, context, { contextMaxTokens: 50, model: 'test' });
-    assert(memo.includes('# Synthesis Memo'));
-    assert(memo.includes('### Emergent Themes'));
-    assert(memo.includes('### Conflicts & Counter-Arguments'));
+    const out2 = await synthesizeMemo(client, context, { contextMaxTokens: 50, model: 'test' });
+    assert(out2 && out2.content);
+    const memo2 = out2.content;
+    assert(memo2.includes('# Synthesis Memo'));
+    assert(memo2.includes('### Emergent Themes'));
+    assert(memo2.includes('### Conflicts & Counter-Arguments'));
   }
 
   console.log('synthesize.test.js: OK');
 }
 
 run().catch((e) => { console.error(e); process.exit(1); });
-

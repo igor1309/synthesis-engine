@@ -102,12 +102,14 @@ async function main() {
       logger.info('collector: synthesis start', { model: process.env.OPENAI_MODEL || 'gpt-4o-mini' });
       const { default: OpenAI } = await import('openai');
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      memoContent = await synthesizeMemo(openai, context, {
+      const result = await synthesizeMemo(openai, context, {
         model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
         temperature: Number(process.env.OPENAI_TEMPERATURE || 0.2),
         projectRoot: process.cwd(),
         contextMaxTokens: Number(process.env.CONTEXT_MAX_TOKENS || 120000)
       });
+      memoContent = result.content;
+      summary.synthesis = result.meta;
     }
 
     // 4. Save Output
@@ -123,7 +125,13 @@ async function main() {
     const runDir = path.join('artifacts', ts);
     await fs.mkdir(runDir, { recursive: true });
     await fs.writeFile(path.join(runDir, 'context.md'), context);
-    const runSummary = { summary, collect: metrics };
+    const runSummary = {
+      schemaVersion: '1.0',
+      generatedAt: new Date().toISOString(),
+      summary,
+      metrics: { totals: metrics.totals || {}, perRepo: metrics.repos || [] },
+      synthesis: summary.synthesis || null
+    };
     await fs.writeFile(path.join(runDir, 'run-summary.json'), JSON.stringify(runSummary, null, 2));
 
     // Enrich step summary with per-repo stats
@@ -131,6 +139,17 @@ async function main() {
     lines.push('## Per-repo stats');
     for (const r of metrics.repos || []) {
       lines.push(`- ${r.repo}@${r.ref}:${r.inboxPath} — md: ${r.mdFiles}, dl: ${r.downloadedCount}, cache hits: ${r.cacheHits}, bytes: ${r.downloadedBytes}, time: ${(r.durationMs/1000).toFixed(2)}s`);
+    }
+    const t = metrics.totals || {};
+    if (t.mdFiles !== undefined) {
+      const ratio = (t.cacheHits + t.cacheMisses) > 0 ? (t.cacheHits / (t.cacheHits + t.cacheMisses)) : 0;
+      lines.push('');
+      lines.push('## Totals');
+      lines.push(`- md files: ${t.mdFiles} · downloaded: ${t.downloadedCount} · bytes: ${human(t.downloadedBytes || 0)}`);
+      lines.push(`- cache: hits ${t.cacheHits} / misses ${t.cacheMisses} (hit rate ${(ratio*100).toFixed(1)}%)`);
+      if (summary.contextBytes !== undefined) lines.push(`- context: files ${summary.contextFiles || 0} · size ${human(summary.contextBytes)} · est tokens ~${summary.contextTokens || 0}`);
+      if (summary.synthesis) lines.push(`- synthesis: model ${summary.synthesis.model} · chunked ${summary.synthesis.chunked ? 'yes' : 'no'} · chunks ${summary.synthesis.chunks}`);
+      if (summary.durationMs !== undefined) lines.push(`- duration: ${(summary.durationMs/1000).toFixed(1)}s`);
     }
     await logger.writeStepSummary(lines.join('\n') + '\n');
   } catch (error) {

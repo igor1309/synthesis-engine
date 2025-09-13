@@ -30,7 +30,7 @@ export async function synthesizeMemo(openai, context, options = {}) {
   if (contextTokens <= maxContextTokens) {
     const messages = buildMessages(prompt, context);
     const out = await callChat(openai, { model, temperature, messages });
-    return validateMemo(out);
+    return { content: validateMemo(out), meta: { model, temperature, contextTokens, maxContextTokens, chunked: false, chunks: 1 } };
   }
 
   // Map-Reduce flow
@@ -42,7 +42,7 @@ export async function synthesizeMemo(openai, context, options = {}) {
     const out = await callChat(openai, { model, temperature, messages });
     partials.push(validatePartial(out));
   }
-  return mergePartials(partials);
+  return { content: mergePartials(partials), meta: { model, temperature, contextTokens, maxContextTokens, chunked: true, chunks: chunks.length } };
 }
 
 function buildMessages(masterPrompt, context) {
@@ -152,4 +152,3 @@ function joinBlocks(blocks) {
 function escapeReg(s) {
   return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-
