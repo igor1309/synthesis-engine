@@ -12,3 +12,4 @@
 - Add ETag-based cache for GitHub file fetches to skip unchanged content
 - Add structured logs and an Actions step summary (counts, sizes, timing)
 - Add JSDoc types or migrate context modules to TypeScript for safer refactors
+
