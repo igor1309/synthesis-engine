@@ -5,6 +5,7 @@ export async function loadConfig(projectRoot = process.cwd()) {
   const env = process.env;
 
   const ghPat = env.GH_PAT && String(env.GH_PAT).trim();
+  const githubBaseUrl = env.GITHUB_BASE_URL && String(env.GITHUB_BASE_URL).trim();
   const reposFile = path.resolve(projectRoot, 'config/repos.txt');
   const tempDir = path.resolve(projectRoot, 'temp_inbox_files');
   const cacheFile = path.resolve(projectRoot, '.cache/github-files.json');
@@ -28,7 +29,7 @@ export async function loadConfig(projectRoot = process.cwd()) {
     throw new Error('No repositories specified in config/repos.txt');
   }
 
-  return { ghPat, projectRoot, tempDir, cacheFile, repos };
+  return { ghPat, baseUrl: githubBaseUrl || undefined, projectRoot, tempDir, cacheFile, repos };
 }
 
 export function parseReposList(text) {
@@ -76,4 +77,3 @@ export function parseRepoSpec(spec) {
 function trimSlashes(p) {
   return String(p).replace(/^\/+|\/+$/g, '') || '';
 }
-

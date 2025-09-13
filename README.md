@@ -80,3 +80,7 @@ jobs:
 
 **Run Summary Schema**
 - See docs/run-summary-schema.md for the full, versioned schema.
+
+Troubleshooting
+- See docs/Troubleshooting.md for common issues (missing inbox, rate limits, invalid tokens, empty memo, CI failures) and fixes.
+- Enterprise/proxy: set `GITHUB_BASE_URL` for GitHub Enterprise; use `HTTP_PROXY/HTTPS_PROXY` as needed. For OpenAI-compatible endpoints, set `OPENAI_BASE_URL`.

@@ -7,7 +7,7 @@
     "scripts": {
       "start": "node collector.js",
       "lint": "eslint .",
-      "test": "bash -lc 'set -e; node test/build-context.test.js; node test/config-parse.test.js; node test/collector.test.js; node test/synthesize.test.js; node test/dotenv.test.js; node test/memo-validate.test.js; node test/openai-retry.test.js; node test/adaptive-concurrency.test.js'",
+      "test": "bash -lc 'set -e; node test/build-context.test.js; node test/config-parse.test.js; node test/collector.test.js; node test/synthesize.test.js; node test/dotenv.test.js; node test/memo-validate.test.js; node test/openai-retry.test.js; node test/adaptive-concurrency.test.js; node test/redact.test.js'",
       "memo:validate": "node bin/memo-validate.js"
     },
     "dependencies": {

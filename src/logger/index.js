@@ -6,6 +6,8 @@ function levelPriority(level) {
   return { error: 0, warn: 1, info: 2, debug: 3 }[level] ?? 2;
 }
 
+import { redactMeta, redactText } from './redact.js';
+
 export function createLogger(options = {}) {
   const envLevel = (process.env.LOG_LEVEL || '').toLowerCase();
   let currentLevel = options.level || (envLevel || 'info');
@@ -13,7 +15,7 @@ export function createLogger(options = {}) {
   const log = (level, msg, meta) => {
     if (levelPriority(level) > levelPriority(currentLevel)) return;
     const rec = { ts: nowIso(), level, msg };
-    if (meta && typeof meta === 'object' && Object.keys(meta).length) rec.meta = meta;
+    if (meta && typeof meta === 'object' && Object.keys(meta).length) rec.meta = redactMeta(meta);
     // Structured JSON line
     process.stdout.write(JSON.stringify(rec) + '\n');
   };
@@ -28,7 +30,7 @@ export function createLogger(options = {}) {
       try {
         const fp = process.env.GITHUB_STEP_SUMMARY;
         if (!fp) return;
-        const md = typeof summary === 'string' ? summary : renderSummaryMarkdown(summary);
+        const md = typeof summary === 'string' ? redactText(summary) : renderSummaryMarkdown(summary);
         await (await import('fs/promises')).writeFile(fp, md + '\n', { flag: 'a' });
       } catch {
         // ignore summary errors
@@ -59,4 +61,3 @@ function human(bytes) {
   if (bytes < 1024*1024) return `${(bytes/1024).toFixed(1)} KB`;
   return `${(bytes/1048576).toFixed(1)} MB`;
 }
-

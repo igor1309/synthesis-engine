@@ -48,7 +48,7 @@ async function main() {
 
       // 1. Collect Files
       logger.info('collector: start file collection', { repos: cfg.repos.length });
-      const gh = await createGitHubClient(cfg.ghPat);
+      const gh = await createGitHubClient(cfg.ghPat, cfg.baseUrl);
       const collected = await collectAll(gh, cfg, { concurrency: 6 });
       const savedFiles = collected.savedFiles;
       metrics = collected.metrics;
@@ -101,7 +101,7 @@ async function main() {
     } else {
       logger.info('collector: synthesis start', { model: process.env.OPENAI_MODEL || 'gpt-4o-mini' });
       const { default: OpenAI } = await import('openai');
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, baseURL: process.env.OPENAI_BASE_URL || undefined });
       const result = await synthesizeMemo(openai, context, {
         model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
         temperature: Number(process.env.OPENAI_TEMPERATURE || 0.2),
