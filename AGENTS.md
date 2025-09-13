@@ -57,6 +57,7 @@ This repository expects AI coding agents (OpenAI Codex/Codex CLI) to follow the 
   - ci: …
   - chore: …
 - Keep commits scoped; avoid mixed concerns.
+- Prefer explicit staging over bulk adds: stage specific files with `git add <path>` instead of `git add -A` to avoid accidentally committing local files (e.g., artifacts, .env, node_modules).
 
 ## Conventions
 - Structure: code in `src/`, tests in `test/`, scripts in `scripts/`, config in `config/`, prompts in `prompts/`, artifacts in `artifacts/`.
