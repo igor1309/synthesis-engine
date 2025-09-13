@@ -173,6 +173,24 @@ async function main() {
       if (summary.synthesis) lines.push(`- synthesis: model ${summary.synthesis.model} · chunked ${summary.synthesis.chunked ? 'yes' : 'no'} · chunks ${summary.synthesis.chunks}`);
       if (summary.durationMs !== undefined) lines.push(`- duration: ${(summary.durationMs/1000).toFixed(1)}s`);
     }
+    // Errors section (sample)
+    const errorSamples = [];
+    for (const r of per) {
+      const arr = Array.isArray(r.errors) ? r.errors : [];
+      for (const e of arr) {
+        if (errorSamples.length >= 5) break;
+        const repoKey = `${r.repo}@${r.ref}:${r.inboxPath}`;
+        const st = (e.status != null) ? ` ${e.status}` : '';
+        errorSamples.push(`- ${repoKey} — [${e.code}${st}] ${e.path}: ${e.msg}`);
+      }
+      if (errorSamples.length >= 5) break;
+    }
+    if (errorSamples.length) {
+      lines.push('');
+      lines.push('## Errors');
+      lines.push(...errorSamples);
+    }
+
     // Remediation tips
     const tips = remediationTips(metrics, summary);
     if (tips.length) {
