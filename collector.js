@@ -131,6 +131,7 @@ async function main() {
       summary,
       metrics: { totals: metrics.totals || {}, perRepo: metrics.repos || [] },
       synthesis: summary.synthesis || null,
+      settings: buildSettingsObject(),
       retries: {
         github: summarizeGithubRetries(metrics),
         openai: summary.synthesis ? { retries: summary.synthesis.openaiRetries || 0, waitMs: summary.synthesis.openaiWaitMs || 0 } : null
@@ -171,7 +172,9 @@ async function main() {
       lines.push('## Tips');
       for (const tip of tips) lines.push(`- ${tip}`);
     }
-    await logger.writeStepSummary(lines.join('\n') + '\n');
+    const stepMd = lines.join('\n') + '\n';
+    await logger.writeStepSummary(stepMd);
+    try { await fs.writeFile(path.join(runDir, 'step-summary.md'), stepMd); } catch {}
   } catch (error) {
     const code = classifyError(error);
     logger.error('collector: error', { error: String(error?.message || error), code });
@@ -238,4 +241,23 @@ function summarizeGithubRetries(metrics) {
     waitMs += r.retryWaitMs || 0;
   }
   return { list, fetch, waitMs };
+}
+
+function buildSettingsObject() {
+  return {
+    logLevel: process.env.LOG_LEVEL || 'info',
+    concurrency: Number(process.env.GITHUB_CONCURRENCY || 6),
+    github: {
+      retries: Number(process.env.GITHUB_RETRIES || 4),
+      timeoutMs: Number(process.env.GITHUB_TIMEOUT || 10000),
+      baseUrl: process.env.GITHUB_BASE_URL || undefined,
+    },
+    openai: {
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      temperature: Number(process.env.OPENAI_TEMPERATURE || 0.2),
+      baseUrl: process.env.OPENAI_BASE_URL || undefined,
+      retries: Number(process.env.OPENAI_RETRIES || 4),
+      baseDelayMs: Number(process.env.OPENAI_BASE_DELAY_MS || 400),
+    }
+  };
 }
