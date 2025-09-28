@@ -1,7 +1,18 @@
 # Synthesis Engine
 
-**Synthesis Engine** collects markdown from each repo’s inbox, compiles a single context.md, and uses the OpenAI API to produce a verifiable synthesis_memo.md. The memo contains **Part 1: Objective Synthesis** (sourced themes & links) and **Part 2: Critical Analysis** (conflicts, counter-arguments and weaknesses) for easy review and follow-up.
+**Synthesis Engine** collects markdown from each repo’s inbox, compiles a single `context.md`, and uses the OpenAI API to produce a verifiable `synthesis_memo.md`.  
 
+The memo contains:  
+- **Part 1: Objective Synthesis** (sourced themes & links)  
+- **Part 2: Critical Analysis** (conflicts, counter-arguments and weaknesses)  
+
+for easy review and follow-up.
+
+---
+
+## Repository Structure
+
+```
 synthesis-engine/
 ├── .github/
 │   └── workflows/
@@ -15,52 +26,95 @@ synthesis-engine/
 │   └── repos.txt               # List of repositories to analyze
 └── prompts/
     └── master.md               # Master prompt used for synthesis
+```
 
-**Local Run**
-- Requirements: Node.js 20+, bash. For full runs, install deps with `npm install`.
-- Dotenv: Supports `.env` and `.env.local` in repo root (never committed).
-- Outputs: writes `synthesis_memo.md` and `artifacts/<timestamp>/{context.md,run-summary.json}`.
+---
 
-**Quick Dry‑Run (no GitHub, no OpenAI)**
-- `DRY_RUN=1 node collector.js`
-- Produces a valid memo skeleton and placeholder context.
+## Local Run
 
-**Collector Only (skip OpenAI)**
-- Set `GH_PAT` (or add to `.env`). Leave `OPENAI_API_KEY` unset. Then run:
-- `node collector.js`
-- Collects inbox markdown, builds context, and writes a placeholder memo.
+- **Requirements**: Node.js 20+, bash. For full runs, install deps with `npm install`.
+- **Dotenv**: Supports `.env` and `.env.local` in repo root (never committed).
+- **Outputs**: writes `synthesis_memo.md` and `artifacts/<timestamp>/{context.md,run-summary.json}`.
 
-**Full Run (GitHub + OpenAI)**
-- `.env` example:
-  - `GH_PAT=ghp_your_token`
-  - `OPENAI_API_KEY=sk_your_key`
-  - `OPENAI_MODEL=gpt-4o-mini` (optional)
-  - `OPENAI_TEMPERATURE=0.2` (optional)
-  - `CONTEXT_MAX_TOKENS=120000` (optional)
-- Install deps and run:
-- `npm install && node collector.js`
+---
 
-**Notes**
+## Quick Dry-Run (no GitHub, no OpenAI)
+
+```bash
+DRY_RUN=1 node collector.js
+```
+
+Produces a valid memo skeleton and placeholder context.
+
+---
+
+## Collector Only (skip OpenAI)
+
+1. Set `GH_PAT` (or add to `.env`).
+2. Leave `OPENAI_API_KEY` unset.  
+3. Run:
+
+```bash
+node collector.js
+```
+
+Collects inbox markdown, builds context, and writes a placeholder memo.
+
+---
+
+## Full Run (GitHub + OpenAI)
+
+`.env` example:
+
+```bash
+GH_PAT=ghp_your_token
+OPENAI_API_KEY=sk_your_key
+OPENAI_MODEL=gpt-4o-mini        # optional
+OPENAI_TEMPERATURE=0.2          # optional
+CONTEXT_MAX_TOKENS=120000       # optional
+```
+
+Run:
+
+```bash
+npm install && node collector.js
+```
+
+---
+
+## Notes
+
 - Optional context tuning: `LINES_HEAD`, `LINES_TAIL` to truncate large files.
 - Set `DRY_RUN=1` to bypass both GitHub and OpenAI regardless of secrets.
- - See docs/Config.md for env vars, CLI flags, and precedence.
+- See `docs/Config.md` for env vars, CLI flags, and precedence.
 
-CLI flags (override env)
+---
+
+## CLI Flags (override env)
+
 - `--log-level info|debug|warn|error`
 - `--dry-run` (same as `DRY_RUN=1`)
 - `--openai-model gpt-4o-mini`
 - `--openai-temperature 0.2`
 - `--context-max-tokens 120000`
 - `--lines-head 0 --lines-tail 0`
- - `--github-base-url https://ghe.example`
- - `--openai-base-url https://oai.example`
- - `--github-concurrency 6`
+- `--github-base-url https://ghe.example`
+- `--openai-base-url https://oai.example`
+- `--github-concurrency 6`
 
-Example: `node collector.js --dry-run --log-level debug --context-max-tokens 80000`
+**Example:**
 
-**Reusable Workflow**
-- This repo provides a reusable workflow to run synthesis from other repos.
-- Example caller workflow:
+```bash
+node collector.js --dry-run --log-level debug --context-max-tokens 80000
+```
+
+---
+
+## Reusable Workflow
+
+This repo provides a reusable workflow to run synthesis from other repos.  
+
+**Example caller workflow:**
 
 ```yaml
 name: Weekly Synthesis
@@ -82,10 +136,32 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-**Run Summary Schema**
-- See docs/run-summary-schema.md for the full, versioned schema.
+---
 
-Troubleshooting
-- See docs/Troubleshooting.md for common issues (missing inbox, rate limits, invalid tokens, empty memo, CI failures) and fixes.
-- Enterprise/proxy: set `GITHUB_BASE_URL` for GitHub Enterprise; use `HTTP_PROXY/HTTPS_PROXY` as needed. For OpenAI-compatible endpoints, set `OPENAI_BASE_URL`.
- - Citations: by default, validator requires at least one `Source:` citation when context is non-empty. Configure via `MEMO_MIN_CITATIONS` or `npm run memo:validate -- --min-citations <n>`.
+## Run Summary Schema
+
+See `docs/run-summary-schema.md` for the full, versioned schema.
+
+---
+
+## Troubleshooting
+
+See `docs/Troubleshooting.md` for common issues:  
+- missing inbox  
+- rate limits  
+- invalid tokens  
+- empty memo  
+- CI failures  
+
+**Enterprise / proxy**:  
+- Set `GITHUB_BASE_URL` for GitHub Enterprise.  
+- Use `HTTP_PROXY` / `HTTPS_PROXY` as needed.  
+- For OpenAI-compatible endpoints, set `OPENAI_BASE_URL`.
+
+**Citations**:  
+- By default, validator requires at least one `Source:` citation when context is non-empty.  
+- Configure via `MEMO_MIN_CITATIONS` or:  
+
+```bash
+npm run memo:validate -- --min-citations <n>
+```
