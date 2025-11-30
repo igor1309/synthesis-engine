@@ -43,6 +43,21 @@ on:
         required: false
         type: number
         default: 6
+      lines-head:
+        description: Truncate files to first N lines (0 = no limit)
+        required: false
+        type: number
+        default: 100
+      lines-tail:
+        description: Truncate files to last N lines (0 = no limit)
+        required: false
+        type: number
+        default: 50
+      context-max-tokens:
+        description: Max tokens before triggering chunked synthesis
+        required: false
+        type: number
+        default: 80000
     secrets:
       GH_PAT:
         description: GitHub Personal Access Token
@@ -104,6 +119,9 @@ jobs:
           OPENAI_BASE_URL: ${{ inputs['openai-base-url'] }}
           GITHUB_CONCURRENCY: ${{ inputs['github-concurrency'] }}
           FAIL_ON_ERROR: ${{ inputs['fail-on-error'] }}
+          LINES_HEAD: ${{ inputs['lines-head'] }}
+          LINES_TAIL: ${{ inputs['lines-tail'] }}
+          CONTEXT_MAX_TOKENS: ${{ inputs['context-max-tokens'] }}
         run: |
           set -euo pipefail
           node collector.js
