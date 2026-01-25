@@ -49,12 +49,9 @@ This repository expects AI coding agents (OpenAI Codex/Codex CLI) to follow the 
 
 ## Document Log
 - Add a concise entry to `docs/Log.md`: what changed, why, and where.
+- Reference commit topics (reorg, tests, CI, features, observability).
 - Update the log regularly (same PR/session) so it reflects the latest state.
 - Group related bullets; avoid duplication.
-
-## Document Log
-- Add a concise entry to `docs/Log.md`: what changed, why, and where.
-- Reference commit topics (reorg, tests, CI, features, observability).
 
 ## Commit Discipline
 - Stage only relevant files; use clear, conventional commits:
