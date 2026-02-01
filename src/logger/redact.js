@@ -25,10 +25,15 @@ function mask(v) {
 }
 
 function deepMap(obj, fn) {
-  if (Array.isArray(obj)) return obj.map((v) => deepMap(v, (k, vv) => vv));
-  const out = Array.isArray(obj) ? [] : {};
+  if (Array.isArray(obj)) {
+    return obj.map((v, idx) => {
+      if (v && typeof v === 'object') return deepMap(v, fn);
+      return fn(String(idx), v);
+    });
+  }
+  const out = {};
   for (const [k, v] of Object.entries(obj)) {
-    if (v && typeof v === 'object' && !Array.isArray(v)) {
+    if (v && typeof v === 'object') {
       out[k] = deepMap(v, fn);
     } else {
       out[k] = fn(k, v);
@@ -36,4 +41,3 @@ function deepMap(obj, fn) {
   }
   return out;
 }
-

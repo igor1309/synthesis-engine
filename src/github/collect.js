@@ -141,7 +141,9 @@ async function getFileContent(octokit, owner, repo, filePath, ref, ctl) {
   }
   // Fallback: try raw download URL if present (should not happen for file fetch)
   if (!Array.isArray(res.data) && res.data && res.data.download_url) {
-    const raw = await fetch(res.data.download_url, { headers: { Authorization: `token ${octokit.auth}` } }).then(r => r.text());
+    const token = await getAuthToken(octokit);
+    const headers = token ? { Authorization: `token ${token}` } : undefined;
+    const raw = await fetch(res.data.download_url, headers ? { headers } : undefined).then(r => r.text());
     return raw;
   }
   throw new Error(`Unexpected content response for ${owner}/${repo}:${filePath}`);
@@ -242,4 +244,16 @@ function sampleError(code, pathStr, err) {
   const status = err?.status || err?.response?.status;
   const msg = String(err?.message || err || '').slice(0, 160);
   return { code, status: status || null, path: pathStr, msg };
+}
+
+async function getAuthToken(octokit) {
+  if (typeof octokit?.auth !== 'function') return null;
+  try {
+    const auth = await octokit.auth();
+    if (auth && typeof auth === 'object' && auth.token) return auth.token;
+    if (typeof auth === 'string') return auth;
+  } catch {
+    return null;
+  }
+  return null;
 }

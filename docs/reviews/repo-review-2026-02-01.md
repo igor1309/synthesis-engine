@@ -30,8 +30,8 @@ description: "Repository review findings and risks."
 - Should the workflow commit job pull a memo artifact, or should the reusable workflow perform the commit directly?
 - Are any repos private or likely to include large files where the `download_url` fallback is exercised?
 
-## Testing Gaps
+## Testing Gaps (Closed)
 
-- No test asserts that chunked synthesis preserves bullets/sections after merge (map-reduce path). `test/synthesize.test.js`
-- No test covers redaction of secrets inside arrays. `test/redact.test.js`
-- No test for `download_url` fallback behavior (private/large file path). `src/github/collect.js:143`
+- Chunked synthesis merge now asserts bullets/sources survive map-reduce. `test/synthesize.test.js`
+- Redaction now covers array and nested array secrets. `test/redact.test.js`
+- Added `download_url` fallback/auth header test. `test/download-url-fallback.test.js`

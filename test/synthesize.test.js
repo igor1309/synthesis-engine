@@ -42,6 +42,8 @@ async function run() {
     assert(memo2.includes('# Synthesis Memo'));
     assert(memo2.includes('### Emergent Themes'));
     assert(memo2.includes('### Conflicts & Counter-Arguments'));
+    assert(memo2.includes('* **Theme A:**'), 'expected merged theme bullets');
+    assert(memo2.includes('**Source:** `a.md`'), 'expected merged sources');
   }
 
   console.log('synthesize.test.js: OK');

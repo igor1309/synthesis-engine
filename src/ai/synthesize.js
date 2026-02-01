@@ -141,9 +141,9 @@ function mergePartials(partials) {
   for (const p of partials) {
     const part1 = extractSection(p, 'PART 1: OBJECTIVE SYNTHESIS');
     const part2 = extractSection(p, 'PART 2: CRITICAL ANALYSIS');
-    const sectionThemes = extractSubsection(part1, '###\s*Emergent Themes');
-    const sectionConnections = extractSubsection(part1, '###\s*Surprising Connections');
-    const sectionConflicts = extractSubsection(part2, '###\s*Conflicts\s*&\s*Counter-Arguments');
+    const sectionThemes = extractSubsection(part1, 'Emergent Themes');
+    const sectionConnections = extractSubsection(part1, 'Surprising Connections');
+    const sectionConflicts = extractSubsection(part2, 'Conflicts & Counter-Arguments');
     if (sectionThemes) themes.push(sectionThemes.trim());
     if (sectionConnections) connections.push(sectionConnections.trim());
     if (sectionConflicts) conflicts.push(sectionConflicts.trim());
@@ -174,12 +174,16 @@ function mergePartials(partials) {
   return validateMemo(merged);
 }
 
-function extractSubsection(md, headingPattern) {
-  const re = new RegExp(`(${headingPattern})\s*\n`, 'mi');
+function extractSubsection(md, heading) {
+  const re = heading instanceof RegExp
+    ? heading
+    : new RegExp(`^###\\s*${escapeReg(heading)}\\s*$`, 'mi');
   const m = re.exec(md);
   if (!m) return '';
   const start = m.index + m[0].length;
-  const rest = md.slice(start);
+  let rest = md.slice(start);
+  if (rest.startsWith('\r\n')) rest = rest.slice(2);
+  else if (rest.startsWith('\n')) rest = rest.slice(1);
   const nextHeading = /^###\s+|^##\s+/m;
   const next = nextHeading.exec(rest);
   return (next ? rest.slice(0, next.index) : rest).trim();
