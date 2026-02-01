@@ -1,4 +1,15 @@
+---
+date: 2026-02-01
+model: gpt-5.2
+description: "Project change log."
+---
+
 # Log
+
+## 2026-02-01
+
+- Memo validation: normalized `synthesis_memo.md` (remove fenced wrapper, add front matter, keep required sections/citations).
+- Process: refreshed `todo/top-priorities.md` formatting and front matter per markdown rules.
 
 ## 2025-09-13
 

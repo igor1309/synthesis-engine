@@ -1,4 +1,9 @@
-```markdown
+---
+date: 2026-02-01
+model: gpt-5.2
+description: "Synthesis memo for the latest run."
+---
+
 # Synthesis Memo
 
 ---
@@ -37,5 +42,3 @@
     *   **Argument A:** "Агент без памяти — это просто вызов функции." (from `memory-bank-ai-agents-2025-09-03-07-13-46.md`)
     *   **Argument B:** "Агент, который может всё, — это агент, который будет постоянно галлюцинировать." (from `ai-agent-learning-phases-2025-08-26-18-46-07.md`)
     *   **Analysis:** This conflict highlights the challenge of balancing the need for memory in AI agents to maintain context while avoiding the pitfalls of over-reliance on memory that can lead to inaccuracies or hallucinations.
-
-```
