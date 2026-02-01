@@ -40,3 +40,14 @@ jobs:
           git add synthesis_memo.md
           git diff --staged --quiet || git commit -m "docs: generate new synthesis memo for $(date -u +'%Y-%m-%d')"
           git push
+      - name: Send memo to Telegram
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BOT_TOKEN:-}" ] || [ -z "${CHAT_ID:-}" ]; then
+            echo "Telegram secrets not set; skipping"
+            exit 0
+          fi
+          curl -sS -f -F chat_id="$CHAT_ID" -F document=@"synthesis_memo.md" -F caption="Synthesis Memo $(date -u +'%Y-%m-%d')" "https://api.telegram.org/bot$BOT_TOKEN/sendDocument"
