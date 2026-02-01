@@ -8,6 +8,7 @@ description: "Project change log."
 
 ## 2026-02-01
 
+- Review: captured repo review findings in `docs/reviews/repo-review-2026-02-01.md`.
 - Memo validation: normalized `synthesis_memo.md` (remove fenced wrapper, add front matter, keep required sections/citations).
 - Process: refreshed `todo/top-priorities.md` formatting and front matter per markdown rules.
 
