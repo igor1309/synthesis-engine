@@ -2,21 +2,23 @@ import assert from 'assert';
 import { synthesizeMemo } from '../src/ai/synthesize.js';
 
 class FakeOpenAI {
-  constructor(mode = 'chat') {
+  constructor(mode = 'chat', options = {}) {
+    const wrap = options.wrap === true;
     if (mode === 'chat') {
       this.chat = { completions: { create: async ({ messages }) => ({
-        choices: [{ message: { content: makeOutputFrom(messages[0].content) } }]
+        choices: [{ message: { content: makeOutputFrom(messages[0].content, wrap) } }]
       }) } };
     } else {
-      this.responses = { create: async ({ input }) => ({ output_text: makeOutputFrom(input) }) };
+      this.responses = { create: async ({ input }) => ({ output_text: makeOutputFrom(input, wrap) }) };
     }
   }
 }
 
-function makeOutputFrom(input) {
+function makeOutputFrom(input, wrap = false) {
   // Return a minimal but valid memo referencing the presence of input size
   const size = Buffer.byteLength(String(input), 'utf-8');
-  return `# Synthesis Memo\n\n---\n\n## PART 1: OBJECTIVE SYNTHESIS\n\n### Emergent Themes\n* **Theme A:** From input ${size} bytes.\n  * **Source:** \`a.md\`\n\n### Surprising Connections\n* **Connection:** a -> b\n  * **Reasoning:** demo\n\n---\n\n## PART 2: CRITICAL ANALYSIS\n\n### Conflicts & Counter-Arguments\n* **Conflict:** X vs Y\n  * **Argument A:** \"A\" (from \`a.md\`)\n  * **Argument B:** \"B\" (from \`b.md\`)\n  * **Analysis:** demo\n`;
+  const memo = `# Synthesis Memo\n\n---\n\n## PART 1: OBJECTIVE SYNTHESIS\n\n### Emergent Themes\n* **Theme A:** From input ${size} bytes.\n  * **Source:** \`a.md\`\n\n### Surprising Connections\n* **Connection:** a -> b\n  * **Reasoning:** demo\n\n---\n\n## PART 2: CRITICAL ANALYSIS\n\n### Conflicts & Counter-Arguments\n* **Conflict:** X vs Y\n  * **Argument A:** \"A\" (from \`a.md\`)\n  * **Argument B:** \"B\" (from \`b.md\`)\n  * **Analysis:** demo\n`;
+  return wrap ? `\`\`\`markdown\n${memo}\n\`\`\`` : memo;
 }
 
 async function run() {
@@ -32,9 +34,9 @@ async function run() {
     assert(memo.includes('PART 2'));
   }
 
-  // Chunked path (force very small limit)
+  // Chunked path (force very small limit) with fenced outputs
   {
-    const client = new FakeOpenAI('chat');
+    const client = new FakeOpenAI('chat', { wrap: true });
     const context = ['# REPO CONTENT', '## Files', '### a.md', 'A', '### b.md', 'B', '### c.md', 'C'].join('\n');
     const out2 = await synthesizeMemo(client, context, { contextMaxTokens: 50, model: 'test' });
     assert(out2 && out2.content);
@@ -44,6 +46,7 @@ async function run() {
     assert(memo2.includes('### Conflicts & Counter-Arguments'));
     assert(memo2.includes('* **Theme A:**'), 'expected merged theme bullets');
     assert(memo2.includes('**Source:** `a.md`'), 'expected merged sources');
+    assert(!memo2.includes('```'), 'expected fences stripped in merged output');
   }
 
   console.log('synthesize.test.js: OK');

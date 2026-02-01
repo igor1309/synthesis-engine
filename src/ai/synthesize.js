@@ -9,8 +9,9 @@ export async function loadMasterPrompt(projectRoot) {
   const fp = `${projectRoot}/prompts/master.md`;
   try {
     const data = await fs.readFile(fp, 'utf-8');
-    if (!data.includes('--- CONTEXT ---')) return data.trim() + '\n\n--- CONTEXT ---\n\n';
-    return data;
+    const body = stripFrontMatter(data);
+    if (!body.includes('--- CONTEXT ---')) return body.trim() + '\n\n--- CONTEXT ---\n\n';
+    return body;
   } catch {
     // Minimal fallback prompt
     return [
@@ -110,16 +111,46 @@ async function callChat(openai, { model, temperature, messages }, stats) {
 }
 
 function validateMemo(text) {
-  const s = String(text || '').trim();
+  const s = normalizeMemo(text);
   if (!s) throw new Error('Synthesis memo is empty');
   if (!/^#\s*Synthesis Memo/m.test(s)) return s; // accept even if header missing
   return s;
 }
 
 function validatePartial(text) {
-  const s = String(text || '').trim();
+  const s = normalizeMemo(text);
   if (!s) throw new Error('Partial synthesis memo is empty');
   return s;
+}
+
+function normalizeMemo(text) {
+  let s = String(text || '').trim();
+  if (!s) return '';
+  s = stripWrappingFence(s);
+  return s.trim();
+}
+
+function stripWrappingFence(text) {
+  if (!text.startsWith('```')) return text;
+  const lines = text.split(/\r?\n/);
+  if (!lines[0].startsWith('```')) return text;
+  let end = lines.length - 1;
+  while (end > 0 && !lines[end].startsWith('```')) end--;
+  if (end <= 0) return text;
+  return lines.slice(1, end).join('\n');
+}
+
+function stripFrontMatter(text) {
+  const s = String(text || '');
+  if (!s.startsWith('---')) return s;
+  const lines = s.split(/\r?\n/);
+  if (lines.length < 3) return s;
+  let end = -1;
+  for (let i = 1; i < lines.length; i++) {
+    if (lines[i].trim() === '---') { end = i; break; }
+  }
+  if (end === -1) return s;
+  return lines.slice(end + 1).join('\n');
 }
 
 function extractSection(md, heading) {
@@ -139,14 +170,25 @@ function mergePartials(partials) {
   const conflicts = [];
 
   for (const p of partials) {
-    const part1 = extractSection(p, 'PART 1: OBJECTIVE SYNTHESIS');
-    const part2 = extractSection(p, 'PART 2: CRITICAL ANALYSIS');
-    const sectionThemes = extractSubsection(part1, 'Emergent Themes');
-    const sectionConnections = extractSubsection(part1, 'Surprising Connections');
-    const sectionConflicts = extractSubsection(part2, 'Conflicts & Counter-Arguments');
+    const part1 = extractSection(p, 'PART 1: OBJECTIVE SYNTHESIS') || p;
+    const part2 = extractSection(p, 'PART 2: CRITICAL ANALYSIS') || p;
+    const sectionThemes = extractSubsection(part1, 'Emergent Themes') || extractSubsection(p, 'Emergent Themes');
+    const sectionConnections = extractSubsection(part1, 'Surprising Connections') || extractSubsection(p, 'Surprising Connections');
+    const sectionConflicts = extractSubsection(part2, 'Conflicts & Counter-Arguments') || extractSubsection(p, 'Conflicts & Counter-Arguments');
     if (sectionThemes) themes.push(sectionThemes.trim());
     if (sectionConnections) connections.push(sectionConnections.trim());
     if (sectionConflicts) conflicts.push(sectionConflicts.trim());
+  }
+
+  const mergedThemes = joinBlocks(themes);
+  const mergedConnections = joinBlocks(connections);
+  const mergedConflicts = joinBlocks(conflicts);
+  const missing = [];
+  if (!hasBullet(mergedThemes)) missing.push('Emergent Themes');
+  if (!hasBullet(mergedConnections)) missing.push('Surprising Connections');
+  if (!hasBullet(mergedConflicts)) missing.push('Conflicts & Counter-Arguments');
+  if (missing.length) {
+    throw new Error(`Merged synthesis memo missing bullet items under: ${missing.join(', ')}`);
   }
 
   const merged = [
@@ -157,17 +199,17 @@ function mergePartials(partials) {
     '## PART 1: OBJECTIVE SYNTHESIS',
     '',
     '### Emergent Themes',
-    joinBlocks(themes),
+    mergedThemes,
     '',
     '### Surprising Connections',
-    joinBlocks(connections),
+    mergedConnections,
     '',
     '---',
     '',
     '## PART 2: CRITICAL ANALYSIS',
     '',
     '### Conflicts & Counter-Arguments',
-    joinBlocks(conflicts),
+    mergedConflicts,
     ''
   ].join('\n');
 
@@ -193,6 +235,10 @@ function joinBlocks(blocks) {
   const parts = blocks.filter(Boolean).map(s => s.trim()).filter(Boolean);
   if (parts.length === 0) return '';
   return parts.join('\n');
+}
+
+function hasBullet(section) {
+  return /^\s*[-*]\s+/m.test(section || '');
 }
 
 function escapeReg(s) {
