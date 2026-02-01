@@ -44,7 +44,10 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-          MEMO_PATH: synthesis_memo.md
         run: |
           set -euo pipefail
-          node scripts/send-telegram-memo.js
+          if [ -z "${BOT_TOKEN:-}" ] || [ -z "${CHAT_ID:-}" ]; then
+            echo "Telegram secrets not set; skipping"
+            exit 0
+          fi
+          curl -sS -f -F chat_id="$CHAT_ID" -F document=@"synthesis_memo.md" -F caption="Synthesis Memo $(date -u +'%Y-%m-%d')" "https://api.telegram.org/bot$BOT_TOKEN/sendDocument"
