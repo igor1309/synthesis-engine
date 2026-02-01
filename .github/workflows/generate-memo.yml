@@ -28,6 +28,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Download synthesis artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: synthesis-artifacts
+          path: .
       - name: Commit and push the new memo
         run: |
           git config --global user.name 'Synthesis Engine Bot'

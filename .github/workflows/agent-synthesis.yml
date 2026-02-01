@@ -151,8 +151,8 @@ jobs:
           echo "files_downloaded=$files_downloaded" >> "$GITHUB_OUTPUT"
           echo "duration_ms=$duration_ms" >> "$GITHUB_OUTPUT"
 
-      - name: Upload artifacts on failure
-        if: failure()
+      - name: Upload synthesis artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: synthesis-artifacts
