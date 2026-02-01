@@ -8,6 +8,7 @@ description: "Project change log."
 
 ## 2026-02-01
 
+- Multiple fixes (see git for details).
 - Synthesis reliability: handle fenced LLM outputs, tolerate section variance, and fail fast on empty merges; add fenced-output test.
 - Prompt hygiene: remove fenced example, instruct no code fences, and strip prompt front matter before use.
 - Project housekeeping: normalized memo file format and refreshed top priorities list.
