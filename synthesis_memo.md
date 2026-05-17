@@ -5,140 +5,136 @@
 ## PART 1: OBJECTIVE SYNTHESIS
 
 ### Emergent Themes
-*   **[AI Coding Practices]:** The importance of structured coding practices and the pitfalls of relying solely on AI-generated code without proper oversight.
-    *   **Source:** `2025-08-25-06-23-48-ai-coding-errors-avoidance.md`
+*   **[AI Coding Practices]:** The importance of structured coding practices and the integration of AI tools in software development to enhance productivity and maintain code quality.
     *   **Source:** `2025-08-25-18-21-15-ai-coding-issues.md`
+    *   **Source:** `2025-08-25-06-23-48-ai-coding-errors-avoidance.md`
     *   Quote: "Слепое доверие ведет к катастрофе."
-*   **[RAG and Embeddings Challenges]:** The limitations of using embeddings in Retrieval-Augmented Generation (RAG) and strategies to mitigate these issues.
-    *   **Source:** `2025-08-25-08-21-12-rag-embeddings-issues.md`
-    *   **Source:** `2025-09-10-18-19-49-уроки-rag-техники.md`
-    *   Quote: "Семантическая схожесть ≠ фактическая релевантность."
-*   **[AI Agent Development Phases]:** A structured approach to developing AI agents, emphasizing the importance of memory and orchestration.
+*   **[AI Agent Development]:** The phased approach to developing AI agents, emphasizing the need for memory, orchestration, and contextual understanding.
     *   **Source:** `2025-08-26-18-46-07-ai-agent-learning-phases.md`
     *   **Source:** `2025-09-03-07-13-46-memory-bank-ai-agents.md`
     *   Quote: "Агент без памяти — это просто вызов функции."
-*   **[Prompt Engineering and Workflow Optimization]:** Techniques for effective prompt engineering and the iterative process of refining prompts using AI tools.
+*   **[Prompt Engineering]:** The significance of effective prompt design and the use of AI to generate and refine prompts for better outcomes.
     *   **Source:** `2025-08-26-17-12-55-ai-prompt-workflow.md`
-    *   **Source:** `2025-09-10-19-11-36-developer-mode-mcp.md`
-    *   Quote: "Я почти никогда не пишу их с нуля."
-*   **[AI Tools and Integration]:** The growing ecosystem of AI tools and their integration into workflows, including community-driven solutions.
-    *   **Source:** `2025-09-10-16-43-49-n8n-community-nodes.md`
-    *   **Source:** `2025-09-20-09-34-53-telegram-publisher.md`
-    *   Quote: "Именно там я в последнее время нахожу самую мякотку."
-*   **[AI-Powered Tools for Content Creation]:** The integration of AI tools in content generation processes, enhancing productivity and creativity.
-    *   **Source:** `2025-09-25-10-15-17-банана-prompts-картинки-watermark.md`
-    *   **Source:** `2025-10-19-06-20-37-персонализированная-детская-книга.md`
-*   **[Automation and Efficiency in Workflows]:** The use of AI to automate repetitive tasks and streamline workflows, particularly in coding and project management.
-    *   **Source:** `2025-09-26-18-18-57-perplexity-tasks-automation.md`
-    *   **Source:** `2025-10-06-14-14-39-plan-act-automation.md`
-*   **[Memory and Context in AI Agents]:** The development of memory systems for AI agents to enhance their contextual understanding and improve interaction quality.
+    *   **Source:** `2025-09-08-07-14-19-ai-tdd-metaprompting.md`
+    *   Quote: "Не в том, чтобы с нуля придумать идеальный промпт, а в том, чтобы выстроить процесс."
+*   **[Integration of AI Tools]:** The integration of various AI tools and frameworks to streamline workflows and enhance the capabilities of AI applications.
+    *   **Source:** `2025-09-01-04-02-54-dify-locally-deploy-lm.md`
+    *   **Source:** `2025-09-10-04-38-54-uber-invoice-automation-llm.md`
+    *   Quote: "Dify – это полноценное локальное решение для работы с LLM-приложениями."
+*   **[AI Integration in Workflows]:** The integration of AI tools into various workflows is emphasized, showcasing how they can enhance productivity and streamline processes.
+    *   **Source:** `2025-09-25-12-30-02-chrome-devtools-mcp.md`
+    *   **Source:** `2025-10-10-12-29-45-локальный-интеллект-без-облака.md`
+*   **[Memory and Context Management]:** The importance of memory and context in AI agents is highlighted, focusing on how they can improve interaction quality and relevance.
+    *   **Source:** `2025-11-03-12-31-55-memory-copilot-prompt.md`
     *   **Source:** `2025-11-03-14-15-14-mem-agent-memory-architecture.md`
-    *   **Source:** `2025-11-11-08-20-16-claude-code-synthetic.md`
-*   **[AI Coding and Automation]:** The integration of AI agents in coding workflows enhances efficiency and reduces manual effort in software development.
-    *   **Source:** `2025-11-10-16-19-43-headless-coding-agents.md`
+*   **[Prompt Engineering and Optimization]:** Techniques for optimizing prompts and enhancing AI responses are discussed, indicating a growing focus on effective communication with AI.
+    *   **Source:** `2025-10-21-08-20-54-оптимизация-промптов.md`
+    *   **Source:** `2025-11-10-14-15-17-локальный-интеллект-без-облака.md`
+*   **[AI Agent Development and Integration]:** The notes emphasize the growing trend of integrating AI agents into various workflows, particularly in coding and application development.
     *   **Source:** `2025-11-12-04-18-56-claude-code-workflow.md`
-*   **[Agent Collaboration and Delegation]:** The use of subagents and delegation strategies allows for more complex task management and execution in coding environments.
-    *   **Source:** `2025-11-12-16-20-27-claude-code-subagents.md`
-    *   **Source:** `2025-11-17-18-21-53-file-first-binary-search.md`
-*   **[Memory and Context Management]:** Effective memory management and context engineering are crucial for optimizing AI agent performance and ensuring relevant information is retained.
     *   **Source:** `2025-12-01-16-21-58-plan-knigi-iskusstvennyj-intellekt.md`
-    *   **Source:** `2026-01-16-12-36-55-humanizer-ai-signals.md`
-*   **[AI-Assisted Development Workflows]:** The integration of AI tools into software development processes enhances productivity and efficiency.
-    *   **Source:** `2026-02-03-01-45-27-vibe-coding-ai-assisted.md`
+*   **[Privacy and Data Management]:** There is a recurring concern about data privacy, especially when using AI models from different providers, highlighting the need for secure data handling practices.
+    *   **Source:** `2025-11-11-08-20-16-claude-code-synthetic.md`
+    *   **Source:** `2026-01-18-22-14-56-open-source-provider-limits.md`
+*   **[Prompt Engineering and Optimization]:** The importance of crafting effective prompts for AI models is a significant theme, with various strategies discussed for enhancing AI responses.
+    *   **Source:** `2025-11-15-08-17-35-gpt-5-prompting-guide.md`
+    *   **Source:** `2026-01-20-08-25-12-промпт-диалог-улучшение.md`
+*   **[AI-Assisted Development Workflows]:** The integration of AI tools like Claude Code and Codex into software development processes enhances productivity and facilitates complex task management.
+    *   **Source:** `2026-01-31-10-53-28-claude-code-playground.md`
     *   **Source:** `2026-02-01-12-37-03-claude-code-workflow.md`
-    *   Quote: "AI-assisted engineering - совсем другой способ делать софт."
-*   **[Agent-Based Systems]:** The use of AI agents for automating tasks and decision-making processes is becoming increasingly prevalent.
-    *   **Source:** `2026-02-05-08-36-24-.md`
-    *   **Source:** `2026-02-11-12-57-22-ai-native-workflow-agents.md`
-    *   Quote: "Агенты должны сами проверять свою работу – компилировать, линтить, запускать тесты и валидировать вывод."
-*   **[Tool Integration and Transparency]:** The importance of clear communication about tool functionalities and parameters when using AI agents is emphasized.
+*   **[Multi-Agent Systems]:** The use of multiple AI agents to handle distinct tasks simultaneously improves efficiency and allows for more complex problem-solving capabilities.
+    *   **Source:** `2026-02-19-18-43-26-codex-multi-agent-mode.md`
+    *   **Source:** `2026-02-21-10-04-02-ai-agent-development.md`
+*   **[AI in Business Automation]:** AI tools are increasingly being utilized for automating business processes, including marketing analysis, customer support, and operational tasks.
+    *   **Source:** `2026-02-11-18-55-09-avtomatizatsiya-propuskov-kuryerov.md`
+    *   **Source:** `2026-02-24-06-44-55-saas-aviabilet-bot-claude.md`
+*   **[Prompt Engineering and Persona Selection]:** The effectiveness of AI responses is significantly influenced by the specificity of prompts and the persona defined for the AI.
+    *   **Source:** `2026-02-24-09-32-28-persona-selection-model.md`
+    *   **Source:** `2026-02-21-18-17-19-llm-stil-smi.md`
+*   **[AI Agent Transparency]:** The importance of transparency in AI agent interactions to enhance user confidence and understanding.
     *   **Source:** `2026-02-26-04-30-26-прозрачность-инструментов-агентов.md`
-    *   **Source:** `2026-02-24-16-15-58-claude-programmatic-tool-calling.md`
-    *   Quote: "Before calling any tool or executing any command, always explain: What the tool does."
-*   **[AI Memory Management]:** The integration of memory management features in AI systems allows for persistent context retention across sessions, enhancing user experience and efficiency.
-    *   **Source:** `2026-02-27-06-33-31-claude-code-memory.md`
-    *   **Source:** `2026-02-27-09-01-00-openclaw-auto-memory.md`
-    *   Quote: "Теперь Claude Code запоминает контекст проекта между сессиями - паттерны отладки, предпочтения в коде, архитектурные решения."
-*   **[Multi-Agent Systems (MAS) Development]:** The trend towards developing flexible and heterogeneous multi-agent systems that can autonomously handle various tasks is gaining traction.
     *   **Source:** `2026-02-27-06-32-34-mas-agents-orchestrator.md`
-    *   **Source:** `2026-02-27-12-45-50_DUPL.md`
-    *   Quote: "Рой агентов самостоятельно справляется с любым запросом извне."
-*   **[AI-Driven Code Review]:** The implementation of AI in code review processes is improving efficiency and accuracy, with specialized agents analyzing pull requests from multiple perspectives.
-    *   **Source:** `2026-03-10-05-08-02-claude-code-review.md`
-    *   **Source:** `2026-03-05-16-20-51-ai-driven-code-review.md`
-    *   Quote: "Пять независимых ревьюеров анализируют изменения с разных сторон."
-*   **[AI Agent Integration in Development Workflows]:** The integration of AI agents into software development processes can enhance efficiency but may introduce new complexities.
+*   **[Multi-Agent Systems (MAS) Development]:** The trend towards developing flexible, multi-agent systems that can handle diverse tasks autonomously.
+    *   **Source:** `2026-02-27-06-32-34-mas-agents-orchestrator.md`
+    *   **Source:** `2026-03-05-15-07-02-deep-research-agent.md`
+*   **[AI Memory and Context Management]:** The significance of memory management in AI systems to maintain context across interactions and improve performance.
+    *   **Source:** `2026-02-27-06-33-31-claude-code-memory.md`
+    *   **Source:** `2026-03-03-16-51-06-claude-memory-extraction.md`
+*   **[Cost Efficiency in AI Operations]:** Strategies for optimizing costs associated with AI inference and operations, including the use of proxies and local models.
+    *   **Source:** `2026-02-26-12-58-55-llm-inference-gateway.md`
+    *   **Source:** `2026-03-09-18-44-34-vast-ai-vps-launch.md`
+*   **[AI Agents and Automation]:** The integration of AI agents into various workflows is seen as a transformative force, enhancing productivity and efficiency.
     *   **Source:** `2026-03-17-08-33-08-ai-agents-ci-cd.md`
     *   **Source:** `2026-04-27-16-51-36-ai-.md`
-    *   Quote: "Теперь вы можете сделать код чертовски чище, если заставите ИИ сделать это за вас."
-*   **[Local AI Model Deployment]:** The deployment of local AI models is becoming increasingly accessible, with specific hardware recommendations for optimal performance.
+*   **[Local LLM Deployment]:** There is a growing interest in deploying local language models (LLMs) on consumer hardware, with specific recommendations for optimal configurations.
     *   **Source:** `2026-03-19-10-13-53-local-llm-mac-deploy.md`
     *   **Source:** `2026-04-28-07-36-31-llm-.md`
-    *   Quote: "Глобально, мак с 64 ГБ под условную GPT OSS 20B - это лучший вариант."
-*   **[Prompt Engineering Best Practices]:** Effective prompting techniques are crucial for maximizing the performance of AI models, particularly in generating quality outputs.
+*   **[Prompt Engineering]:** Effective prompting techniques are critical for maximizing the performance of AI models, with resources and best practices being shared widely.
     *   **Source:** `2026-04-03-10-11-19-claude-prompting-best-practices.md`
-    *   **Source:** `2026-03-16-08-37-53-prompts-yandex-prompthub.md`
-    *   Quote: "Используйте проверенные промпты, которые есть на Промптхабе."
+    *   **Source:** `2026-04-04-04-55-14-claude-skills-collection.md`
+*   **[AI in Business Processes]:** The application of AI in traditional business processes is being explored, particularly in automating and enhancing existing workflows.
+    *   **Source:** `2026-04-28-06-00-52-ai-saas-code-market.md`
+    *   **Source:** `2026-04-20-10-30-38-tunnel-management-cli.md`
 
 ### Surprising Connections
-*   **Connection:** The concept of **Memory Bank** in `2025-09-03-07-13-46-memory-bank-ai-agents.md` could be metaphorically applied to the **structured prompt engineering** discussed in `2025-08-26-17-12-55-ai-prompt-workflow.md`.
-    *   **Reasoning:** Both emphasize the importance of maintaining context and structured information to enhance AI performance.
+*   **Connection:** The concept of AI agent memory in `2025-09-03-07-13-46-memory-bank-ai-agents.md` could be metaphorically applied to the idea of "reasoning as a tool" discussed in `2025-08-28-04-17-15-reasoning-as-tool.md`.
+    *   **Reasoning:** Both emphasize the importance of maintaining context and continuity in interactions, whether through memory or structured reasoning processes.
     *   **Source:** `2025-09-03-07-13-46-memory-bank-ai-agents.md`
-    *   **Source:** `2025-08-26-17-12-55-ai-prompt-workflow.md`
-*   **Connection:** The **RAG techniques** outlined in `2025-09-10-18-19-49-уроки-rag-техники.md` directly relate to the **AI coding practices** discussed in `2025-08-25-06-23-48-ai-coding-errors-avoidance.md`, particularly in how both fields require careful management of context and data.
-    *   **Reasoning:** Both highlight the need for precision and understanding in AI applications to avoid errors and inefficiencies.
-    *   **Source:** `2025-09-10-18-19-49-уроки-rag-техники.md`
-    *   **Source:** `2025-08-25-06-23-48-ai-coding-errors-avoidance.md`
+    *   **Source:** `2025-08-28-04-17-15-reasoning-as-tool.md`
+*   **Connection:** The integration of AI tools like Dify in `2025-09-01-04-02-54-dify-locally-deploy-lm.md` directly supports the development of AI agents as outlined in `2025-09-04-10-14-22-ai-agent-montazh-viral.md`.
+    *   **Reasoning:** Dify provides a no-code environment that facilitates the rapid development and deployment of AI agents, enhancing their functionality and accessibility.
+    *   **Source:** `2025-09-01-04-02-54-dify-locally-deploy-lm.md`
+    *   **Source:** `2025-09-04-10-14-22-ai-agent-montazh-viral.md`
 
 ---
-*   **Connection:** The concept of **file-first approaches** in `2025-11-05-20-17-11-file-first-claude-rclone.md` can be linked to the **memory architecture** discussed in `2025-11-03-14-15-14-mem-agent-memory-architecture.md`.
-    *   **Reasoning:** Both emphasize the importance of efficient data handling and retrieval, whether through direct file access or structured memory systems.
-    *   **Source:** `2025-11-05-20-17-11-file-first-claude-rclone.md`
-    *   **Source:** `2025-11-03-14-15-14-mem-agent-memory-architecture.md`
-*   **Connection:** The **automation of tasks** in `2025-09-26-18-18-57-perplexity-tasks-automation.md` aligns with the **AI-powered tools** for content creation in `2025-09-25-10-15-17-банана-prompts-картинки-watermark.md`.
-    *   **Reasoning:** Both highlight the role of AI in reducing manual effort and enhancing productivity across different domains.
-    *   **Source:** `2025-09-26-18-18-57-perplexity-tasks-automation.md`
-    *   **Source:** `2025-09-25-10-15-17-банана-prompts-картинки-watermark.md`
+*   **Connection:** The concept of **memory management** in AI agents as discussed in `2025-11-03-12-31-55-memory-copilot-prompt.md` can be metaphorically linked to **project management** strategies in `2025-10-15-08-20-34-agent-coding-specs.md`.
+    *   **Reasoning:** Both involve organizing and structuring information to enhance efficiency and effectiveness in achieving goals.
+    *   **Source:** `2025-11-03-12-31-55-memory-copilot-prompt.md`
+    *   **Source:** `2025-10-15-08-20-34-agent-coding-specs.md`
+*   **Connection:** The **file-first approach** to AI coding in `2025-11-10-14-15-17-локальный-интеллект-без-облака.md` directly complements the **semantic search capabilities** introduced in `2025-11-07-14-14-43-cursor-semantic-search.md`.
+    *   **Reasoning:** Both approaches aim to enhance the efficiency of information retrieval and processing within AI systems.
+    *   **Source:** `2025-11-10-14-15-17-локальный-интеллект-без-облака.md`
+    *   **Source:** `2025-11-07-14-14-43-cursor-semantic-search.md`
 
 ---
-*   **Connection:** The concept of using headless coding agents in `2025-11-10-16-19-43-headless-coding-agents.md` can be metaphorically linked to the delegation strategies discussed in `2025-11-12-16-20-27-claude-code-subagents.md`.
-    *   **Reasoning:** Both approaches emphasize the importance of offloading tasks to specialized agents to enhance overall productivity.
-    *   **Source:** `2025-11-10-16-19-43-headless-coding-agents.md`
-    *   **Source:** `2025-11-12-16-20-27-claude-code-subagents.md`
-*   **Connection:** The memory architecture discussed in `2026-01-16-12-36-55-humanizer-ai-signals.md` directly informs the strategies for managing context in coding agents as outlined in `2025-12-01-16-21-58-plan-knigi-iskusstvennyj-intellekt.md`.
-    *   **Reasoning:** Both highlight the necessity of structured memory and context management to improve AI interactions and outputs.
-    *   **Source:** `2026-01-16-12-36-55-humanizer-ai-signals.md`
+*   **Connection:** The concept of using **Claude Code** for project management in `2025-12-01-16-21-58-plan-knigi-iskusstvennyj-intellekt.md` can be linked to the **AI agent development** strategies discussed in `2025-11-12-04-18-56-claude-code-workflow.md`.
+    *   **Reasoning:** Both highlight the utility of AI in organizing and managing complex tasks, whether in writing or coding.
     *   **Source:** `2025-12-01-16-21-58-plan-knigi-iskusstvennyj-intellekt.md`
+    *   **Source:** `2025-11-12-04-18-56-claude-code-workflow.md`
+*   **Connection:** The **privacy concerns** raised in `2025-11-11-08-20-16-claude-code-synthetic.md` resonate with the **data management practices** suggested in `2026-01-18-22-14-56-open-source-provider-limits.md`.
+    *   **Reasoning:** Both emphasize the necessity of secure data handling when utilizing AI technologies.
+    *   **Source:** `2025-11-11-08-20-16-claude-code-synthetic.md`
+    *   **Source:** `2026-01-18-22-14-56-open-source-provider-limits.md`
 
 ---
-*   **Connection:** The concept of **vibe coding** in `2026-02-03-01-45-27-vibe-coding-ai-assisted.md` could be metaphorically applied to the problem of **AI-assisted development workflows** described in `2026-02-01-12-37-03-claude-code-workflow.md`.
-    *   **Reasoning:** Both concepts emphasize a more intuitive and less rigid approach to coding, where the focus is on creativity and rapid iteration rather than strict adherence to traditional coding practices.
-    *   **Source:** `2026-02-03-01-45-27-vibe-coding-ai-assisted.md`
-    *   **Source:** `2026-02-01-12-37-03-claude-code-workflow.md`
-*   **Connection:** The **Programmatic Tool Calling** feature in `2026-02-24-16-15-58-claude-programmatic-tool-calling.md` directly enhances the **transparency of tool usage** discussed in `2026-02-26-04-30-26-прозрачность-инструментов-агентов.md`.
-    *   **Reasoning:** By allowing AI to execute multiple tool calls in a single pass, it reduces the need for intermediate context, thus streamlining the process and making it easier for users to understand what the AI is doing.
-    *   **Source:** `2026-02-24-16-15-58-claude-programmatic-tool-calling.md`
+*   **Connection:** The concept of **multi-agent systems** in `2026-02-19-18-43-26-codex-multi-agent-mode.md` can be linked to the **AI-assisted development workflows** described in `2026-01-31-10-53-28-claude-code-playground.md`, suggesting that using multiple agents can streamline the development process by distributing tasks effectively.
+    *   **Reasoning:** This connection highlights how leveraging multiple AI agents can enhance the overall efficiency of development workflows, allowing for parallel processing of tasks.
+    *   **Source:** `2026-02-19-18-43-26-codex-multi-agent-mode.md`
+    *   **Source:** `2026-01-31-10-53-28-claude-code-playground.md`
+*   **Connection:** The **persona selection model** discussed in `2026-02-24-09-32-28-persona-selection-model.md` can be applied to the **AI in business automation** theme in `2026-02-11-18-55-09-avtomatizatsiya-propuskov-kuryerov.md`, indicating that defining specific roles for AI can enhance its effectiveness in automating business tasks.
+    *   **Reasoning:** This connection emphasizes the importance of tailoring AI responses to specific business contexts, improving the relevance and accuracy of automated outputs.
+    *   **Source:** `2026-02-24-09-32-28-persona-selection-model.md`
+    *   **Source:** `2026-02-11-18-55-09-avtomatizatsiya-propuskov-kuryerov.md`
+
+---
+*   **Connection:** The concept of transparency in AI agent interactions in `2026-02-26-04-30-26-прозрачность-инструментов-агентов.md` can be linked to the need for effective memory management in AI systems discussed in `2026-03-03-16-51-06-claude-memory-extraction.md`.
+    *   **Reasoning:** Both themes emphasize the necessity of clear communication and context retention to enhance user experience and trust in AI systems.
     *   **Source:** `2026-02-26-04-30-26-прозрачность-инструментов-агентов.md`
-
----
-*   **Connection:** The concept of **memory management** in AI systems as discussed in `2026-02-27-06-33-31-claude-code-memory.md` can be metaphorically linked to the **self-assessment** feature in multi-agent systems described in `2026-02-27-06-32-34-mas-agents-orchestrator.md`.
-    *   **Reasoning:** Both themes emphasize the importance of retaining and utilizing contextual knowledge to enhance performance and decision-making.
-    *   **Source:** `2026-02-27-06-33-31-claude-code-memory.md`
+    *   **Source:** `2026-03-03-16-51-06-claude-memory-extraction.md`
+*   **Connection:** The technical implementation of multi-agent systems in `2026-02-27-06-32-34-mas-agents-orchestrator.md` directly relates to the cost optimization strategies outlined in `2026-02-26-12-58-55-llm-inference-gateway.md`.
+    *   **Reasoning:** Both documents highlight the need for efficient resource management and the orchestration of multiple agents to achieve operational efficiency.
     *   **Source:** `2026-02-27-06-32-34-mas-agents-orchestrator.md`
-*   **Connection:** The **AI-driven code review** process in `2026-03-10-05-08-02-claude-code-review.md` directly relates to the **automation of repetitive tasks** discussed in `2026-03-08-17-59-47-claude-code-loop.md`.
-    *   **Reasoning:** Both highlight the potential of AI to streamline workflows and reduce manual effort in software development.
-    *   **Source:** `2026-03-10-05-08-02-claude-code-review.md`
-    *   **Source:** `2026-03-08-17-59-47-claude-code-loop.md`
+    *   **Source:** `2026-02-26-12-58-55-llm-inference-gateway.md`
 
 ---
-*   **Connection:** The concept of **AI agents in CI/CD** processes in `2026-03-17-08-33-08-ai-agents-ci-cd.md` could be metaphorically applied to the **local AI model deployment** strategies discussed in `2026-03-19-10-13-53-local-llm-mac-deploy.md`.
-    *   **Reasoning:** Both themes emphasize the importance of optimizing workflows and resource management to enhance productivity and efficiency in software development.
-    *   **Source:** `2026-03-17-08-33-08-ai-agents-ci-cd.md`
-    *   **Source:** `2026-03-19-10-13-53-local-llm-mac-deploy.md`
-*   **Connection:** The **prompt engineering best practices** highlighted in `2026-04-03-10-11-19-claude-prompting-best-practices.md` directly support the **AI agent integration** strategies in `2026-03-17-08-33-08-ai-agents-ci-cd.md`.
-    *   **Reasoning:** Effective prompting can significantly improve the interaction quality with AI agents, leading to better outcomes in development workflows.
+*   **Connection:** The concept of local LLM deployment in `2026-04-28-07-36-31-llm-.md` could be metaphorically applied to the idea of automating traditional business processes discussed in `2026-04-28-06-00-52-ai-saas-code-market.md`.
+    *   **Reasoning:** Both themes emphasize the importance of leveraging existing infrastructure and knowledge to enhance productivity and efficiency in various domains.
+    *   **Source:** `2026-04-28-07-36-31-llm-.md`
+    *   **Source:** `2026-04-28-06-00-52-ai-saas-code-market.md`
+*   **Connection:** The insights on prompt engineering from `2026-04-03-10-11-19-claude-prompting-best-practices.md` directly inform the development of skills mentioned in `2026-04-04-04-55-14-claude-skills-collection.md`.
+    *   **Reasoning:** Effective prompting is essential for the successful implementation of AI skills, ensuring that they perform optimally in real-world applications.
     *   **Source:** `2026-04-03-10-11-19-claude-prompting-best-practices.md`
-    *   **Source:** `2026-03-17-08-33-08-ai-agents-ci-cd.md`
+    *   **Source:** `2026-04-04-04-55-14-claude-skills-collection.md`
 
 ---
 
@@ -149,55 +145,53 @@
 ### Conflicts & Counter-Arguments
 *   **Conflict: [AI Autonomy vs. Human Oversight]**
     *   **Argument A:** "Слепое доверие ведет к катастрофе." (from `2025-08-25-18-21-15-ai-coding-issues.md`)
-    *   **Argument B:** "AI — лучший в мире учитель, если его правильно использовать." (from `2025-08-25-15-15-22-ai-code-at-faang.md`)
-    *   **Analysis:** This conflict highlights the tension between relying on AI for autonomous coding versus the necessity of human oversight to ensure quality and accuracy.
-*   **Conflict: [Efficiency vs. Complexity in AI Tools]**
-    *   **Argument A:** "Система для корректного управления сбоями API и непредвиденными проблемами." (from `2025-09-10-04-38-54-uber-invoice-automation-llm.md`)
-    *   **Argument B:** "Не оборачивайте API «как есть» без смысла." (from `2025-09-14-11-34-52-mcp-instrument-optimization.md`)
-    *   **Analysis:** This conflict illustrates the challenge of balancing the complexity of integrating multiple AI tools with the need for efficient and effective solutions in real-world applications.
-*   **Conflict: [Automation vs. Human Creativity]**
-    *   **Argument A:** "AI tools can significantly enhance productivity and creativity in content generation." (from `2025-09-25-10-15-17-банана-prompts-картинки-watermark.md`)
-    *   **Argument B:** "Over-reliance on AI may stifle genuine human creativity and lead to homogenized content." (from `2025-10-20-14-14-07-аудит-личного-бренда.md`)
-    *   **Analysis:** The tension lies in balancing the efficiency gained from automation with the potential loss of unique human expression in creative processes.
-*   **Conflict: [Memory Systems vs. Data Privacy]**
-    *   **Argument A:** "Memory systems in AI agents enhance contextual understanding and improve user interaction." (from `2025-11-03-14-15-14-mem-agent-memory-architecture.md`)
-    *   **Argument B:** "Implementing memory systems raises concerns about data privacy and user consent." (from `2025-11-10-14-15-17-локальный-интеллект-без-облака.md`)
-    *   **Analysis:** This conflict highlights the need for careful consideration of ethical implications when developing AI systems that retain user data for improved performance.
-*   **Conflict: [Efficiency vs. Complexity]**
-    *   **Argument A:** "Делегирование — важный навык в AI Coding" (from `2025-11-10-16-19-43-headless-coding-agents.md`)
-    *   **Argument B:** "Сложность фронтенда росла экспоненциально" (from `2025-12-26-12-33-42-память-агентов-персонализация.md`)
-    *   **Analysis:** The tension arises between the push for automation and delegation to enhance efficiency versus the increasing complexity of managing these systems, which can lead to potential confusion and errors.
-*   **Conflict: [Autonomy vs. Control]**
-    *   **Argument A:** "Агент должен перестать быть общим и начать чувствоваться как 'ваш' агент" (from `2026-01-16-12-33-42-память-агентов-персонализация.md`)
-    *   **Argument B:** "Не читай и не запрашивай пароли – они не должны оказаться у тебя в контексте" (from `2026-01-23-10-19-28-vps-claude-code.md`)
-    *   **Analysis:** This conflict highlights the challenge of balancing the need for AI agents to operate autonomously while ensuring that sensitive information remains secure and controlled by the user.
+    *   **Argument B:** "AI — лучший в мире учитель, если его правильно использовать." (from `2025-08-25-06-23-48-ai-coding-errors-avoidance.md`)
+    *   **Analysis:** The tension lies in the balance between relying on AI for efficiency and the necessity of human oversight to ensure quality and correctness in outputs.
+*   **Conflict: [Structured Prompting vs. Creative Freedom]**
+    *   **Argument A:** "Промптингом обязательно должна заниматься рассуждающая модель." (from `2025-09-08-07-14-19-ai-tdd-metaprompting.md`)
+    *   **Argument B:** "Не забываем делать Structured Output." (from `2025-09-10-18-19-49-уроки-rag-техники.md`)
+    *   **Analysis:** This conflict highlights the challenge of maintaining a structured approach to prompting while allowing for the creative flexibility that AI can offer in generating responses.
+*   **Conflict: [Automation vs. Human Oversight]**
+    *   **Argument A:** "Агенты должны учиться внутри рабочего потока, а не существовать отдельно." (from `2025-10-07-06-21-35-agentic-ai-lessons.md`)
+    *   **Argument B:** "Люди остаются критичны... нужны для контроля точности, compliance, суждений и edge cases." (from `2025-10-07-06-21-35-agentic-ai-lessons.md`)
+    *   **Analysis:** There is a tension between the reliance on automated systems for efficiency and the necessity of human oversight to ensure quality and ethical standards.
+*   **Conflict: [Simplicity vs. Complexity in AI Tools]**
+    *   **Argument A:** "Сейчас доступная серия из пяти модулей, обучающих основам ИИ для игр." (from `2025-09-26-16-17-56-runway-ai-gamedev.md`)
+    *   **Argument B:** "Сложно делать кодерского агента, скажу вам." (from `2025-10-06-10-15-57-эпопея-альфы-рефакторинг.md`)
+    *   **Analysis:** The push for simplified AI tools for broader accessibility contrasts with the complexity involved in developing and maintaining sophisticated AI systems.
 
 ---
-*   **Conflict: [AI Autonomy vs. Human Oversight]**
-    *   **Argument A:** "Агенты должны сами проверять свою работу – компилировать, линтить, запускать тесты и валидировать вывод." (from `2026-02-11-12-57-22-ai-native-workflow-agents.md`)
-    *   **Argument B:** "Качество со временем почти неизбежно 'плывёт': агент копирует паттерны, включая плохие, появляется энтропия/ai-slop." (from `2026-02-21-10-04-02-ai-agent-development.md`)
-    *   **Analysis:** There is a tension between the desire for AI agents to operate autonomously and the necessity for human oversight to maintain quality and prevent the propagation of errors.
-*   **Conflict: [Efficiency vs. Transparency]**
-    *   **Argument A:** "Before calling any tool or executing any command, always explain: What the tool does." (from `2026-02-26-04-30-26-прозрачность-инструментов-агентов.md`)
-    *   **Argument B:** "Теперь Claude пишет Python-код(!), который вызывает ваши инструменты программно внутри sandbox-контейнера." (from `2026-02-24-16-15-58-claude-programmatic-tool-calling.md`)
-    *   **Analysis:** While transparency in tool usage is crucial for user understanding, it may introduce inefficiencies by requiring additional explanations that could slow down the workflow.
+*   **Conflict: [Privacy vs. Usability]**
+    *   **Argument A:** "Субъективно, вероятность того, что данные будут использованы для обучения (как минимум) существенно выше." (from `2025-11-11-08-20-16-claude-code-synthetic.md`)
+    *   **Argument B:** "Безопасность не должна убивать скорость." (from `2026-01-18-22-14-56-open-source-provider-limits.md`)
+    *   **Analysis:** This conflict highlights the tension between ensuring data privacy and maintaining usability and efficiency in AI applications.
+*   **Conflict: [Prompt Complexity vs. Clarity]**
+    *   **Argument A:** "Промпт хорош, когда ты уже понимаешь, что строишь, и хочешь ничего не упустить." (from `2026-01-11-08-20-19-claude-code-prompt.md`)
+    *   **Argument B:** "Убирайте вежливые фразы, не оставляйте место для интерпретации." (from `2026-01-25-10-17-00-структуры-анализа-данных.md`)
+    *   **Analysis:** This conflict illustrates the challenge of balancing detailed, complex prompts with the need for clear and concise communication to the AI.
+*   **Conflict: [AI Efficiency vs. Human Oversight]**
+    *   **Argument A:** "Claude сам исправляет большинство багов." (from `2026-02-01-12-37-03-claude-code-workflow.md`)
+    *   **Argument B:** "Качество со временем почти неизбежно 'плывёт': агент копирует паттерны, включая плохие." (from `2026-02-21-10-04-02-ai-agent-development.md`)
+    *   **Analysis:** This conflict highlights the tension between the efficiency of AI in automating tasks and the necessity of human oversight to maintain quality and prevent the propagation of errors.
+*   **Conflict: [Cost Efficiency vs. Token Usage]**
+    *   **Argument A:** "На практике экономия от 10x до 75x в зависимости от задачи." (from `2026-02-24-16-15-58-claude-programmatic-tool-calling.md`)
+    *   **Argument B:** "Но расход токенов больше, с этим надо смириться." (from `2026-02-24-10-13-08-многозадачные-репозитории.md`)
+    *   **Analysis:** This conflict illustrates the trade-off between achieving cost efficiency through AI automation and the increased token usage associated with complex AI operations, raising questions about the sustainability of such approaches.
 
 ---
-*   **Conflict: [Performance vs. Resource Management]**
-    *   **Argument A:** "Claude сам записывает заметки в директорию ~/.claude/projects/<project>/memory/" (from `2026-02-27-06-33-31-claude-code-memory.md`)
-    *   **Argument B:** "Каждая находка оценивается по шкале 0-100, и только высокоуверенные проблемы (порог 80+) публикуются как комментарии" (from `2026-03-10-05-08-02-claude-code-review.md`)
-    *   **Analysis:** The tension arises between the need for comprehensive memory retention and the efficient use of resources, as extensive memory management may lead to increased computational overhead.
-*   **Conflict: [Flexibility vs. Control in Multi-Agent Systems]**
-    *   **Argument A:** "Рой агентов самостоятельно справляется с любым запросом извне." (from `2026-02-27-06-32-34-mas-agents-orchestrator.md`)
-    *   **Argument B:** "Агент читает и живую экспертизу - например, открытые переписки в Telegram‑чатах" (from `2026-03-05-15-07-02-deep-research-agent.md`)
-    *   **Analysis:** While flexibility in multi-agent systems allows for diverse problem-solving approaches, it may compromise control over the quality and relevance of the information being processed, leading to potential inefficiencies.
-*   **Conflict: [Efficiency vs. Complexity in AI Integration]**
-    *   **Argument A:** "Проблема в том, что это не ускоряет работу, а создает новую форму торможения." (from `2026-03-17-08-33-08-ai-agents-ci-cd.md`)
-    *   **Argument B:** "Теперь вы можете сделать код чертовски чище, если заставите ИИ сделать это за вас." (from `2026-04-27-16-51-36-ai-.md`)
-    *   **Analysis:** The tension lies in the perception that while AI integration can enhance efficiency, it may also introduce complexities that hinder workflow, suggesting a need for careful implementation strategies.
-*   **Conflict: [Local Model Performance vs. Hardware Limitations]**
-    *   **Argument A:** "Глобально, мак с 64 ГБ под условную GPT OSS 20B - это лучший вариант." (from `2026-04-28-07-36-31-llm-.md`)
-    *   **Argument B:** "Если же у вас 8 гигов - ее сестричка Gemma 4 E2B станет отличным вариантом." (from `2026-04-28-07-36-31-llm-.md`)
-    *   **Analysis:** This conflict highlights the disparity between the ideal hardware requirements for optimal AI performance and the reality of users with limited resources, necessitating scalable solutions that accommodate varying hardware capabilities.
-
----
+*   **Conflict: [Cost vs. Quality of AI Services]**
+    *   **Argument A:** "Внутренние результаты Anthropic впечатляют: выход кода на инженера вырос на 200% за год." (from `2026-03-10-05-08-02-claude-code-review.md`)
+    *   **Argument B:** "Даже с учетом того что 5 агентов работают параллельно по 20 минут - кажется дороговато." (from `2026-03-10-05-08-02-claude-code-review.md`)
+    *   **Analysis:** There is a tension between the perceived benefits of enhanced AI capabilities and the associated costs, raising questions about the sustainability of such investments.
+*   **Conflict: [Simplicity vs. Complexity in AI Systems]**
+    *   **Argument A:** "Скиллы общие — состояние изолировано, но не md-файлы." (from `2026-03-04-14-34-00-openclaw-zeroclaw-agents.md`)
+    *   **Argument B:** "Агент подгружает skill постепенно и перестаёт галлюцинировать." (from `2026-03-04-05-26-33-skill-conductor-agents-guide.md`)
+    *   **Analysis:** The complexity of managing multiple agents and skills can lead to operational challenges, suggesting a need for balance between simplicity in design and the richness of functionality.
+*   **Conflict: [Local Deployment vs. Cloud Solutions]**
+    *   **Argument A:** "На моей основной работе появилась необходимость создать удобную замену cloudflare tunnels" (from `2026-04-20-10-30-38-tunnel-management-cli.md`)
+    *   **Argument B:** "Локальные модели для простых смертных: что выбрать, если у вас нет супер-компьютера" (from `2026-04-28-07-36-31-локальные-llm-руководство.md`)
+    *   **Analysis:** There is a tension between the push for local deployment solutions that require less infrastructure and the reliance on cloud services that offer scalability but may incur costs and dependency issues.
+*   **Conflict: [AI Automation vs. Human Oversight]**
+    *   **Argument A:** "Теперь вы можете сделать код чертовски чище, если заставите ИИ сделать это за вас" (from `2026-04-27-16-51-36-код-ai-автоматизация.md`)
+    *   **Argument B:** "Не автоматизируйте хаос" (from `2026-03-17-08-33-08-ai-agents-ci-cd.md`)
+    *   **Analysis:** The discourse reflects a conflict between the benefits of automating processes with AI and the necessity of maintaining human oversight to ensure quality and coherence in outputs.
